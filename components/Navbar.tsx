@@ -8,7 +8,12 @@ const Navbar = () => {
     <>
       <NavbarStyle>
         <Link href={"/"}>
-          <LogoStyle />
+        <StyledImage
+            src="/assets/LOGOPNG.png"
+            alt="gathr logo"
+            width={150}
+            height={80}
+          />
         </Link>
         <NavbarLinks>
           <Link href={"/about"}>
@@ -52,15 +57,6 @@ const StyledImage = styled(Image)`
   align-items: center;
   justify-content: center;
 `;
-
-const LogoStyle = () => (
-  <StyledImage
-    src="/assets/LOGOPNG.png"
-    alt="gathr logo"
-    width={150}
-    height={80}
-  />
-);
 
 const NavbarBtn = styled.button`
   width: 100px;
