@@ -67,6 +67,7 @@ const NavbarBtn = styled.button`
   color: #f64a45;
   cursor: pointer;
   transition: background-color 0.5s, color 0.3s;
+
   &:hover {
     background-color: #f57265;
     color: #f3d8b6;
