@@ -20,7 +20,7 @@ const Navbar = () => {
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
           </Link>
           <Link href={"/events"}><NavbarAnimatedLinks>My Events</NavbarAnimatedLinks></Link>
-          <Link href={""}>
+          <Link href={"/login"}>
             <NavbarBtn>Login/Register</NavbarBtn>
           </Link>
         </NavbarLinks>
@@ -40,10 +40,10 @@ const NavbarStyle = styled.nav`
 `;
 
 const NavbarLinks = styled.div`
-  min-width: 280px;
+  min-width: 320px;
   display: flex;
   justify-content: space-around;
-  gap: 5%;
+  gap: 10%;
   color: #f64a45;
   cursor: pointer;
   justify-content: center;

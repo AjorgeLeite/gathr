@@ -34,8 +34,9 @@ const Footer = () => {
 };
 
 const FooterStyle = styled.footer`
+padding-top: 50px;
   width: 100%;
-  height: 150px;
+  height: 200px;
   background-color: #f3d8b6;
   display: flex;
   flex-direction: column;
