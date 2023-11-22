@@ -1,6 +1,7 @@
 import React, { useState, FC } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import Image from "next/image";
 
 type RegisterTypes = {
   isLoggedIn: boolean;
@@ -96,7 +97,7 @@ const RegisterForm: FC<RegisterTypes> = ({
             <p>Account Created</p>
           )}
           {submitRequest.isLoading && (
-            <img
+            <Image
               src="/assets/loading1s.gif"
               width={50}
               height={50}

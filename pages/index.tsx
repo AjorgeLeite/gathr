@@ -8,7 +8,7 @@ export default function Home() {
       <HomepageContainer>
         <HomepageBanner>
           <StyledLogo
-            src={"/assets/LOGOROUNDPNGBEIJE.png"}
+            src={"/assets/LOGOROUNDPNGBeije.png"}
             alt={"gathr logo"}
             width={800}
             height={800}
