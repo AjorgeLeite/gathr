@@ -1,86 +1,122 @@
-import React, { useState } from "react";
+import React, { useState, FC } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
 type RegisterTypes = {
   isLoggedIn: boolean;
-  setIsLoggedIn: 
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
+  setUserName: (name: string) => void;
 };
 
-const RegisterForm: React.FC<RegisterTypes> = ({ isLoggedIn, setIsLoggedIn }, setUserName) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const RegisterForm: FC<RegisterTypes> = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  setUserName,
+}) => {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [submitRequest, setSubmitRequest] = useState({
     isLoading: false,
     submitted: false,
     error: false,
+    errorMessage: "",
   });
 
-  const onRegisterSubmit = async (e) => {
+  const onRegisterSubmit = async (e: React.FormEvent) => {
     try {
-      e.preventDefault(); // Prevenir carregar na mesma pagina ( form )
-      setSubmitRequest({ isLoading: true });
+      e.preventDefault();
+      setSubmitRequest({
+        isLoading: true,
+        submitted: false,
+        error: false,
+        errorMessage: "",
+      });
       const response = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:SGjuPeF3/auth/signup",
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/signup",
         { email, password, name }
       );
-      setSubmitRequest({ error: false, submitted: true });
+      setSubmitRequest({
+        error: false,
+        submitted: true,
+        isLoading: false,
+        errorMessage: "",
+      });
       console.log("Register");
       setUserName(name);
       setIsLoggedIn(true);
-    } catch (error) {
+    } catch (error: any) {
       setSubmitRequest({
         error: true,
         submitted: true,
         isLoading: false,
         errorMessage: error.response.data.message,
       });
-      console.log("Error: " + error);
+      console.error("Error: " + error);
     }
   };
-  
+
   return (
     <>
-      <h2>Please Register Here: </h2>
-      <FormStyle onSubmit={onRegisterSubmit}>
-        <TextInputs
-          required
-          placeholder="Name"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
-        />
-        <TextInputs
-          type="email"
-          required
-          placeholder="Email"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
-        />
-        <TextInputs
-          type="password"
-          required
-          placeholder="Password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-        <SubmitBtn>Register</SubmitBtn>
-        {submitRequest.error && <p>{submitRequest.errorMessage}</p>}
-        {!submitRequest.error && submitRequest.submitted && (
-          <p>Account Created</p>
-        )}
-        {submitRequest.isLoading && <img src="../assets/infinity.svg" />}
-      </FormStyle>
+      <FormContainer>
+        <h2>Please Register Here: </h2>
+        <FormStyle onSubmit={onRegisterSubmit}>
+          <TextInputs
+            className="txtinput"
+            required
+            placeholder="Name"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+          />
+          <TextInputs
+            className="txtinput"
+            type="email"
+            required
+            placeholder="Email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <TextInputs
+            className="txtinput"
+            type="password"
+            required
+            placeholder="Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <SubmitBtn type="submit">Register</SubmitBtn>
+          {submitRequest.error && <p>{submitRequest.errorMessage}</p>}
+          {!submitRequest.error && submitRequest.submitted && (
+            <p>Account Created</p>
+          )}
+          {submitRequest.isLoading && (
+            <img
+              src="/assets/loading1s.gif"
+              width={50}
+              height={50}
+              alt="Loading"
+            />
+          )}
+        </FormStyle>
+      </FormContainer>
     </>
   );
 };
 
+const FormContainer = styled.div`
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+`;
 const FormStyle = styled.form`
   width: 300px;
   display: flex;
@@ -91,18 +127,21 @@ const FormStyle = styled.form`
 `;
 
 const TextInputs = styled.input`
-  background-color: black;
+  background-color: transparent;
   color: white;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 10px;
-  border-color: #9b083b;
+  border-color: #f3d8b6;
 `;
 
 const SubmitBtn = styled.button`
   width: 100px;
-  height: 50px;
-  border-radius: 20px;
-  border-color: red;
+  height: 40px;
+  border-radius: 10px;
+  border-color: #f3d8b6;
+  background-color: transparent;
+  color: #f3d8b6;
+  cursor: pointer;
 `;
 
-// export default RegisterForm;
+export default RegisterForm;

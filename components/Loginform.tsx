@@ -26,7 +26,7 @@ const LoginForm: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
       localStorage.setItem("authToken", response.data.authToken);
       setSubmitted(true);
       setIsLoggedIn(true);
-    } catch (error:any) {
+    } catch (error: any) {
       setError(true);
       setSubmitted(true);
       setIsLoading(false);
@@ -56,7 +56,14 @@ const LoginForm: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
           <SubmitBtn>Login</SubmitBtn>
           {error && <p>{errorMessage}</p>}
           {!error && submitted && <p>Logged In</p>}
-          {isLoading && <img src="/assets/loading1s.gif" width={50} height={50} alt="Loading" />}
+          {isLoading && (
+            <img
+              src="/assets/loading1s.gif"
+              width={50}
+              height={50}
+              alt="Loading"
+            />
+          )}
         </FormStyle>
       </FormContainer>
     </>
