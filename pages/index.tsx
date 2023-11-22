@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styled from "styled-components";
-
+import LoginRegisterComp from "@/components/LoginRegisterComp";
 
 export default function Home() {
   return (
@@ -41,6 +41,7 @@ export default function Home() {
           <HomepageInfoText>
             <h1>Log in, Sign up, and start inviting your friends!</h1>
           </HomepageInfoText>
+          <LoginRegisterComp></LoginRegisterComp>
           </HomepageInfoContent>
         </HomepageInfo>
       </HomepageContainer>
@@ -86,6 +87,7 @@ const HomepageInfo = styled.div`
 `;
 const HomepageInfoContent = styled.div`
   width: 100%;
+  gap: 10%;
   min-height: 700px;
   position: relative;
   display: flex;
