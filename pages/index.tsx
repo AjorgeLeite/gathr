@@ -62,6 +62,7 @@ const HomepageContainer = styled.div`
   width: 100%;
   height: auto;
   background-color: #f3d8b6;
+  margin-bottom: 2%;
 `;
 
 const HomepageBanner = styled.div`
@@ -72,11 +73,12 @@ const HomepageBanner = styled.div`
 min-height: 800px;
 `;
 const HomepageBannerText = styled.div`
-margin-right: 20%;
+
 margin-top: 5%;
   font-size: 40px;
-  width: 35%;
-  height: 200px;
+  min-width: 35%;
+  max-width: 60%;
+  min-height: 200px;
   z-index: 99;
   text-align: center;
 `;
@@ -96,8 +98,9 @@ const HomepageInfoContent = styled.div`
 `;
 const HomepageInfoText = styled.div`
   font-size: 40px;
-  width: 35%;
-  height: 200px;
+  min-width: 35%;
+  max-width: 60%;
+  min-height: 200px;
   z-index: 99;
   text-align: center;
   position: relative;

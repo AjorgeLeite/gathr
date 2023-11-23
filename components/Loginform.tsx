@@ -1,6 +1,8 @@
 import { useState, FormEvent } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import Image from "next/image";
+
 
 interface LoginProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -56,7 +58,7 @@ const LoginForm: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
           <SubmitBtn>Login</SubmitBtn>
           {error && <p>{errorMessage}</p>}
           {!error && submitted && <p>Logged In</p>}
-          {isLoading && <img src="/assets/loading1s.gif" width={50} height={50} alt="Loading" />}
+          {isLoading && <Image src="/assets/loading1s.gif" width={50} height={50} alt="Loading" />}
         </FormStyle>
       </FormContainer>
     </>
