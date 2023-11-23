@@ -59,6 +59,7 @@ const RegisterForm: FC<RegisterTypes> = ({
 
   return (
     <>
+<<<<<<< HEAD
       <FormContainer>
         <h2>Please Register Here: </h2>
         <FormStyle onSubmit={onRegisterSubmit}>
@@ -105,6 +106,45 @@ const RegisterForm: FC<RegisterTypes> = ({
             />
           )}
         </FormStyle>
+=======
+    <FormContainer>
+      <h2>Please Register Here: </h2>
+      <FormStyle onSubmit={onRegisterSubmit}>
+        <TextInputs
+        className="txtinput"
+          required
+          placeholder="Name"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+        />
+        <TextInputs
+        className="txtinput"
+          type="email"
+          required
+          placeholder="Email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+        />
+        <TextInputs
+        className="txtinput"
+          type="password"
+          required
+          placeholder="Password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+        />
+        <SubmitBtn type="submit">Register</SubmitBtn>
+        {submitRequest.error && <p>{submitRequest.errorMessage}</p>}
+        {!submitRequest.error && submitRequest.submitted && <p>Account Created</p>}
+        {submitRequest.isLoading && <Image src="/assets/loading1s.gif" width={50} height={50} alt="Loading" />}
+      </FormStyle>
+>>>>>>> development
       </FormContainer>
     </>
   );

@@ -50,17 +50,17 @@ const StyledImage = styled(Image)`
 `;
 
 const PageContainer = styled.div`
-  background-color: #f3d8b6;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: #f3d8b6;
-  overflow: hidden;
-  margin-bottom: -3%;
+background-color: #f3d8b6;
+width: 100%;
+height: auto;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 10px;
+color: #f3d8b6;
+overflow: hidden;
+margin-bottom: -3%;
 `;
 
 const LoginRegisterContainer = styled.div`

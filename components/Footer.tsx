@@ -34,7 +34,6 @@ const Footer = () => {
 };
 
 const FooterStyle = styled.footer`
-padding-top: 50px;
   width: 100%;
   height: auto;
   background-color: #f3d8b6;
