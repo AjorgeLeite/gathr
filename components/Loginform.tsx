@@ -2,40 +2,68 @@ import { useState, FormEvent } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import Image from "next/image";
+import { useDispatch, useSelector } from 'react-redux';
+import { loginSuccess, loginFailure } from '../store/action-creators/actions';
+import { useRouter } from "next/router";
+import { setCookie, parseCookies } from 'nookies';
 
 
-interface LoginProps {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+interface LoginFormProps {}
+
+interface RootState {
+  user: {
+    isLoggedIn: boolean;
+    name: string;
+    userId: number | null;
+  };
 }
 
-const LoginForm: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+const LoginForm: React.FC<LoginFormProps> = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user);
+  const router = useRouter();
+
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onLoginSubmit = async (e: FormEvent) => {
     try {
       e.preventDefault();
-      setIsLoading(true);
+
       const response = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/login",
+        'https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/login',
         { email, password }
       );
 
-      localStorage.setItem("authToken", response.data.authToken);
-      setSubmitted(true);
-      setIsLoggedIn(true);
-    } catch (error:any) {
+      setCookie(null, 'authToken', response.data.authToken, {
+        maxAge: 30 * 24 * 60 * 60, 
+        path: '/',
+      });
+
+      const userInfo = await axios.get(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/me",
+        { headers: { Authorization: "Bearer " + response.data.authToken } }
+      );
+
+      dispatch(loginSuccess(userInfo.data.name, userInfo.data.id));
+
+     console.log(
+        "userid: " + userInfo.data.id,
+        "usernames: " + userInfo.data.name,
+      );
+      router.push('/events');
+    } catch (error: any) {
+      dispatch(loginFailure(error.response.data.message));
       setError(true);
       setSubmitted(true);
       setIsLoading(false);
       setErrorMessage(error.response.data.message);
     }
   };
-
   return (
     <>
       <FormContainer>
@@ -83,7 +111,7 @@ const FormStyle = styled.form`
   gap: 20px;
 `;
 
-const TextInputs = styled.input<{ className?: string }>`
+const TextInputs = styled.input`
   background-color: transparent;
   color: white;
   border-radius: 10px;

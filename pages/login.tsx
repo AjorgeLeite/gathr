@@ -27,7 +27,7 @@ const LoginRegister = () => {
         </StyledImage>
             <LoginRegisterContainer>
               <h1>Log in, Sign up, and start inviting your friends!</h1>
-    <LoginRegisterComp></LoginRegisterComp>
+    <LoginRegisterComp />
     </LoginRegisterContainer>
     </PageContainer>
     </>

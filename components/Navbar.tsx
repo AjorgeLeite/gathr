@@ -2,8 +2,29 @@ import React from "react";
 import Image from "next/image";
 import styled from "styled-components";
 import Link from "next/link";
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store/action-creators/actions';
+import { useRouter } from "next/router";
+import { destroyCookie } from 'nookies';
 
 const Navbar = () => {
+
+const router = useRouter();
+const dispatch = useDispatch();
+  const userData = useSelector((userData:any) => userData.user.user);
+  console.log("userData: ", userData);
+
+
+  const handleLogout = () => {
+
+    dispatch(logout());
+
+    destroyCookie(null, 'authToken');
+
+    router.push('/');
+
+  };
+
   return (
     <>
       <NavbarStyle>
@@ -15,14 +36,19 @@ const Navbar = () => {
             height={80}
           />
         </Link>
+        {userData.isLoggedIn && <div>Welcome {userData.name}</div>}
         <NavbarLinks>
           <Link href={"/about"}>
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
           </Link>
           <Link href={"/events"}><NavbarAnimatedLinks>My Events</NavbarAnimatedLinks></Link>
-          <Link href={"/login"}>
-            <NavbarBtn>Login/Register</NavbarBtn>
-          </Link>
+          {userData.isLoggedIn ? (
+            <NavbarBtn onClick={handleLogout} >Logout</NavbarBtn>
+          ) : (
+            <Link href={"/login"}>
+              <NavbarBtn>Login/Register</NavbarBtn>
+            </Link>
+          )}
         </NavbarLinks>
       </NavbarStyle>
     </>
@@ -34,7 +60,6 @@ const NavbarStyle = styled.nav`
   justify-content: space-around;
   align-items: center;
   height: 10%;
-  width: 100%;
   background-color: #f3d8b6;
   filter: drop-shadow(0px 1px 5px #000000);
 `;
