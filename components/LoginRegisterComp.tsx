@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import RegisterForm from "@/components/Registerform";
 import LoginForm from "@/components/Loginform";
-import { SetStateAction } from "react";
 import styled from "styled-components";
 
 
@@ -20,19 +19,13 @@ const LoginRegisterComp = () => {
         {showLogin ? "Register Here" : "Let me Login"}
       </LoginRegisterBtn>
       {showLogin ? (
-        <LoginForm
-          setIsLoggedIn={(value: SetStateAction<boolean>) => {
-            throw new Error("Function not implemented.");
-          }}
-        />
+        <LoginForm/>
       ) : (
         <RegisterForm
           isLoggedIn={false}
           setIsLoggedIn={(isLoggedIn: boolean) => {
-            throw new Error("Function not implemented.");
           }}
           setUserName={(name: string) => {
-            throw new Error("Function not implemented.");
           }}
         />
       )}

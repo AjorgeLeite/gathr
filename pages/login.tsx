@@ -15,17 +15,18 @@ const LoginRegister = () => {
             height={35}
           ></Image>
         </TopBar>
-        <StyledImage
-          src="/assets/2.jpg"
-          alt="celebration"
-          width={1000}
-          height={600}
-        ></StyledImage>
-        <LoginRegisterContainer>
-          <h1>Log in, Sign up, and start inviting your friends!</h1>
-          <LoginRegisterComp></LoginRegisterComp>
-        </LoginRegisterContainer>
-      </PageContainer>
+        <StyledImage 
+        src="/assets/2.jpg"
+            alt="celebration"
+            width={1000}
+            height={600}
+            >
+        </StyledImage>
+            <LoginRegisterContainer>
+              <h1>Log in, Sign up, and start inviting your friends!</h1>
+    <LoginRegisterComp />
+    </LoginRegisterContainer>
+    </PageContainer>
     </>
   );
 };

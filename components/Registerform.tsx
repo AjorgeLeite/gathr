@@ -2,6 +2,7 @@ import React, { useState, FC } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 type RegisterTypes = {
   isLoggedIn: boolean;
@@ -9,11 +10,8 @@ type RegisterTypes = {
   setUserName: (name: string) => void;
 };
 
-const RegisterForm: FC<RegisterTypes> = ({
-  isLoggedIn,
-  setIsLoggedIn,
-  setUserName,
-}) => {
+
+const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -23,6 +21,8 @@ const RegisterForm: FC<RegisterTypes> = ({
     error: false,
     errorMessage: "",
   });
+
+  const router = useRouter();
 
   const onRegisterSubmit = async (e: React.FormEvent) => {
     try {
@@ -46,14 +46,20 @@ const RegisterForm: FC<RegisterTypes> = ({
       console.log("Register");
       setUserName(name);
       setIsLoggedIn(true);
-    } catch (error: any) {
-      setSubmitRequest({
+
+      router.push('/events');
+    } catch (error:any) {
+      if (error.response ) {
+         setSubmitRequest({
+
         error: true,
         submitted: true,
         isLoading: false,
-        errorMessage: error.response.data.message,
+        errorMessage: error?.response.data.message,
       });
       console.error("Error: " + error);
+      }
+     
     }
   };
 
