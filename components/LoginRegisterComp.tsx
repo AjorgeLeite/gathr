@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import RegisterForm from "@/components/Registerform";
 import LoginForm from "@/components/Loginform";
-import { SetStateAction } from "react";
 import styled from "styled-components";
 
 
