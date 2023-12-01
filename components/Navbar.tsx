@@ -36,7 +36,7 @@ const dispatch = useDispatch();
             height={80}
           />
         </Link>
-        {userData.isLoggedIn && <div>Welcome {userData.name}</div>}
+        {userData.isLoggedIn && <RedText>Welcome {userData.name}</RedText>}
         <NavbarLinks>
           <Link href={"/about"}>
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
@@ -55,7 +55,15 @@ const dispatch = useDispatch();
   );
 };
 
+const RedText = styled.text`
+color: #f64a45;
+font-size: 16px;
+margin-left: 5%;
+`;
+
 const NavbarStyle = styled.nav`
+padding-left: 10%;
+padding-right: 10%;
   display: flex;
   justify-content: space-around;
   align-items: center;
