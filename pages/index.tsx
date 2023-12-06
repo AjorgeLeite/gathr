@@ -74,13 +74,20 @@ min-height: 800px;
 `;
 const HomepageBannerText = styled.div`
 
-margin-top: 5%;
+margin-top: 10%;
   font-size: 40px;
   min-width: 35%;
   max-width: 60%;
   min-height: 200px;
   z-index: 99;
   text-align: center;
+
+  @media screen and (max-width: 768px) {
+
+    font-size: 28px;
+    margin-top: 35%;
+  }
+
 `;
 const HomepageInfo = styled.div`
   width: 100%;
@@ -95,6 +102,11 @@ const HomepageInfoContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
+
 `;
 const HomepageInfoText = styled.div`
   font-size: 40px;
@@ -106,6 +118,11 @@ const HomepageInfoText = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+
+  @media screen and (max-width: 768px) {
+    font-size: 18px;
+  }
+
 `;
 const StyledLogo = styled(Image)`
 margin-top: -5px;
