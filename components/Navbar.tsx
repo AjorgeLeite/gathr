@@ -8,42 +8,37 @@ import { useRouter } from "next/router";
 import { destroyCookie } from 'nookies';
 
 const Navbar = () => {
-
-const router = useRouter();
-const dispatch = useDispatch();
+  const router = useRouter();
+  const dispatch = useDispatch();
   const userData = useSelector((userData:any) => userData.user.user);
   console.log("userData: ", userData);
 
-
   const handleLogout = () => {
-
     dispatch(logout());
-
     destroyCookie(null, 'authToken');
-
     router.push('/');
-
   };
 
   return (
     <>
       <NavbarStyle>
         <Link href={"/"}>
-        <StyledImage
+          <StyledImage
             src="/assets/LOGOPNG.png"
             alt="gathr logo"
             width={150}
             height={80}
           />
         </Link>
-        {userData.isLoggedIn && <RedText>Welcome {userData.name}</RedText>}
         <NavbarLinks>
           <Link href={"/about"}>
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
           </Link>
-          <Link href={"/events"}><NavbarAnimatedLinks>My Events</NavbarAnimatedLinks></Link>
+          <Link href={"/events"}>
+            <NavbarAnimatedLinks>My Events</NavbarAnimatedLinks>
+          </Link>
           {userData.isLoggedIn ? (
-            <NavbarBtn onClick={handleLogout} >Logout</NavbarBtn>
+            <NavbarBtn onClick={handleLogout}>Logout</NavbarBtn>
           ) : (
             <Link href={"/login"}>
               <NavbarBtn>Login/Register</NavbarBtn>
@@ -56,20 +51,25 @@ const dispatch = useDispatch();
 };
 
 const RedText = styled.text`
-color: #f64a45;
-font-size: 16px;
-margin-left: 5%;
+  color: #f64a45;
+  font-size: 16px;
+  margin-left: 5%;
 `;
 
 const NavbarStyle = styled.nav`
-padding-left: 10%;
-padding-right: 10%;
+  padding-left: 10%;
+  padding-right: 10%;
   display: flex;
   justify-content: space-around;
   align-items: center;
   height: 10%;
   background-color: #f3d8b6;
   filter: drop-shadow(0px 1px 5px #000000);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const NavbarLinks = styled.div`
@@ -81,6 +81,14 @@ const NavbarLinks = styled.div`
   cursor: pointer;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    padding: 10px;
+    gap: 10px;
+  }
 `;
 
 const StyledImage = styled(Image)`

@@ -61,23 +61,29 @@ justify-content: center;
 gap: 10px;
 color: #f3d8b6;
 overflow: hidden;
-margin-bottom: -3%;
-`;
 
+`;
 const LoginRegisterContainer = styled.div`
-  margin-top: 12%;
-  display: flex;
-  gap: 10%;
-  justify-content: space-around;
-  align-items: center;
-  width: 50%;
-  position: absolute;
-  z-index: 99;
-  h1 {
-    color: white;
-    font-size: 50px;
-    text-align: center;
+margin-top: 12%;
+display: flex;
+gap: 10%;
+justify-content: space-around;
+align-items: center;
+width: 50%;
+position: absolute;
+z-index:99;
+gap: 10px;
+h1 {
+  color:white;
+  font-size: 50px;
+  text-align: center;
+}
+
+@media screen and (max-width: 1280px) {
+    flex-direction: column;
+    width: 80%;
   }
+
 `;
 
 export default LoginRegister;
