@@ -26,7 +26,7 @@ const About = () => {
           <h4>What can you do with gathr? </h4>
           <br />
           <br />
-          <ul>
+
           
               Create Events: Easily create events for any occasion – from casual
               get-togethers to exciting vacations. Describe your event, set the
@@ -55,7 +55,7 @@ const About = () => {
               participants. Vote on activities, suggest ideas, and collaborate
               with your friends to create memorable experiences.
             
-          </ul>
+
         </AboutText>
       </AboutContainer>
     </>
@@ -76,6 +76,10 @@ const AboutText = styled.div`
   position: relative;
   z-index: 99;
   font-size: 18px;
+  @media screen and (max-width: 768px) {
+    font-weight: 600;
+    
+  }
 `;
 
 const AboutContainer = styled.div`

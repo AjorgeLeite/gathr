@@ -63,6 +63,11 @@ const HomepageContainer = styled.div`
   height: auto;
   background-color: #f3d8b6;
   margin-bottom: 2%;
+
+  @media screen and (max-width: 768px) {
+
+    margin-bottom: 5%;
+}
 `;
 
 const HomepageBanner = styled.div`
@@ -75,28 +80,29 @@ min-height: 800px;
 const HomepageBannerText = styled.div`
 
 margin-top: 10%;
-  font-size: 40px;
+  font-size: 35px;
   min-width: 35%;
   max-width: 60%;
   min-height: 200px;
   z-index: 99;
   text-align: center;
+  padding: 20px;
   
 
   @media screen and (max-width: 768px) {
 
     font-size: 28px;
-    margin-top: 30%;
+    margin-top: 10%;
+    max-width: 90%;
+    font-weight: 700;
   }
-  @media screen and (max-width: 1280px) {
 
-  }
   @media screen and (min-width: 1280px) {
     margin-right: 40%;
     width: 50%;
     
   }
-  @media screen and (min-width: 1800px) {
+  @media screen and (min-width: 1750px) {
     background-color: #f3ec78;
     background-image: linear-gradient(45deg, #f3bc78, #f64a45);
     background-size: 100%;
