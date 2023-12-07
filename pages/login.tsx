@@ -32,7 +32,7 @@ const LoginRegister = () => {
 };
 const LoginText = styled.h2`
  margin-right: 30px;
- font-size: 45px;
+ font-size: 55px;
  text-align: center;
  color:white;
 
