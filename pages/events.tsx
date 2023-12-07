@@ -279,11 +279,13 @@ const LoginText = styled.h2`
  text-align: center;
  color:white;
 
-  @media screen and (max-width: 1280px) {
+ @media screen and (max-width: 1280px) {
     margin-right: 0px;
  font-size: 45px;
     flex-direction: column;
     width: 80%;
+    margin-top: 27%;
+    margin-bottom: -5%;
   }
 
 `;

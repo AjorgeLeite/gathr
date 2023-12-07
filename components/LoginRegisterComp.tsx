@@ -61,9 +61,12 @@ justify-content: center;
 gap: 10px;
 border-radius: 10%;
 background-color: rgb(245, 114, 101,0.8);
+
+
 @media screen and (max-width: 768px) {
 background-color: #f64b45cd;
 font-weight: 700;
+margin-bottom: 50px;
 }
 `;
 

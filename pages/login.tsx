@@ -41,7 +41,8 @@ const LoginText = styled.h2`
  font-size: 45px;
     flex-direction: column;
     width: 80%;
-    margin-top: 20%;
+    margin-top: 27%;
+    margin-bottom: -5%;
   }
 
 `;
@@ -77,7 +78,6 @@ justify-content: center;
 gap: 10px;
 color: #f3d8b6;
 overflow: hidden;
-
 `;
 
 const LoginRegisterContainer = styled.div`
