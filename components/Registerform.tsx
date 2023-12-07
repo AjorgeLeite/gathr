@@ -53,7 +53,7 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
   return (
     <>
     <FormContainer>
-      <h2>Please Register Here: </h2>
+      <TextColor>Please Register Here: </TextColor>
       <FormStyle onSubmit={onRegisterSubmit}>
         <TextInputs
         className="txtinput"
@@ -93,6 +93,10 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
     </>
   );
 };
+
+const TextColor = styled.h2`
+color: #f3d8b6;
+`;
 
 const FormContainer = styled.div`
 gap: 20px;

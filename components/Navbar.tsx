@@ -1,17 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import Link from "next/link";
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/action-creators/actions';
 import { useRouter } from "next/router";
 import { destroyCookie } from 'nookies';
 
+interface NavbarStyleProps extends React.HTMLAttributes<HTMLDivElement> {
+  mobileMenuOpen?: boolean;
+}
+
 const Navbar = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
-  const userData = useSelector((userData:any) => userData.user.user);
-  console.log("userData: ", userData);
+  const userData = useSelector((userData: any) => userData.user.user);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -19,17 +31,42 @@ const Navbar = () => {
     router.push('/');
   };
 
+  const navigateTo = (path: string) => {
+    router.push(path);
+    closeMobileMenu();
+  };
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add('mobile-menu-open');
+    } else {
+      document.body.classList.remove('mobile-menu-open');
+    }
+  }, [mobileMenuOpen]);
+
   return (
     <>
-      <NavbarStyle>
-        <Link href={"/"}>
-          <StyledImage
-            src="/assets/LOGOPNG.png"
-            alt="gathr logo"
-            width={150}
-            height={80}
-          />
-        </Link>
+      <NavbarStyle mobileMenuOpen={mobileMenuOpen}>
+
+        <LogoContainer>
+          <Link href={"/"}>
+            <StyledImage
+              src="/assets/LOGOPNG.png"
+              alt="gathr logo"
+              width={150}
+              height={80}
+            />
+          </Link>
+
+
+          <MobileMenuButton onClick={toggleMobileMenu}>
+            <div></div>
+            <div></div>
+            <div></div>
+          </MobileMenuButton>
+        </LogoContainer>
+
+
         <NavbarLinks>
           <Link href={"/about"}>
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
@@ -45,31 +82,67 @@ const Navbar = () => {
             </Link>
           )}
         </NavbarLinks>
+
+
+        {mobileMenuOpen && (
+          <MobileMenu>
+            <div>
+              <NavbarAnimatedLinks onClick={() => navigateTo("/about")}>
+                About Us
+              </NavbarAnimatedLinks>
+              <NavbarAnimatedLinks onClick={() => navigateTo("/events")}>
+                My Events
+              </NavbarAnimatedLinks>
+              {userData.isLoggedIn ? (
+                <NavbarAnimatedLinks onClick={handleLogout}>Logout</NavbarAnimatedLinks>
+              ) : (
+                <NavbarBtn onClick={() => navigateTo("/login")}>
+                  Login/Register
+                </NavbarBtn>
+              )}
+            </div>
+          </MobileMenu>
+        )}
       </NavbarStyle>
     </>
   );
 };
 
-const RedText = styled.text`
-  color: #f64a45;
-  font-size: 16px;
-  margin-left: 5%;
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  
+
+  @media (max-width: 768px) {
+    justify-content: space-around;
+  }
+
 `;
 
-const NavbarStyle = styled.nav`
+const NavbarStyle: React.FC<NavbarStyleProps> = styled.nav<NavbarStyleProps>`
+  position: relative;
   padding-left: 10%;
   padding-right: 10%;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 10%;
   background-color: #f3d8b6;
   filter: drop-shadow(0px 1px 5px #000000);
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
+    height: auto;
   }
+
+  ${(props) =>
+    props.mobileMenuOpen &&
+    css`
+      @media (max-width: 768px) {
+        height: auto;
+      }
+    `}
 `;
 
 const NavbarLinks = styled.div`
@@ -83,11 +156,7 @@ const NavbarLinks = styled.div`
   align-items: center;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 10px;
-    padding: 10px;
-    gap: 10px;
+    display: none; 
   }
 `;
 
@@ -147,6 +216,45 @@ const NavbarAnimatedLinks = styled.div`
       width: 50%;
     }
   }
+
+
+  @media (max-width: 768px) {
+    margin-bottom: 10px;
+  }
+
 `;
+
+const MobileMenuButton = styled.div`
+  display: none;
+  cursor: pointer;
+  width: 30px;
+  height: 20px;
+  flex-direction: column;
+  div {
+    width: 100%;
+    height: 3px;
+    background-color: #f64a45;
+    margin: 3px 0;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const MobileMenu = styled.div`
+  width: 100%;
+  background-color: #f3d8b6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  overflow: hidden; 
+  text-align: center;
+  color: #f64a45;
+  padding: 10px;
+`;
+
+
 
 export default Navbar;
