@@ -48,7 +48,9 @@ const EventItem: React.FC<EventItemProps> = ({
 }) => {
   const userId = useSelector((userId: any) => userId.user.user.userId);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [pollDataMap, setPollDataMap] = useState<Record<number, Poll | null>>({});
+  const [pollDataMap, setPollDataMap] = useState<Record<number, Poll | null>>(
+    {}
+  );
   const [votedPolls, setVotedPolls] = useState<number[]>([]);
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
   const [goingEmails, setGoingEmails] = useState<string[]>([]);
@@ -73,7 +75,11 @@ const EventItem: React.FC<EventItemProps> = ({
     setPollDataMap(initialPollDataMap);
   }, [events, userId]);
 
-  const handleVote = async (pollId: number, optionVote: number, eventId: number) => {
+  const handleVote = async (
+    pollId: number,
+    optionVote: number,
+    eventId: number
+  ) => {
     try {
       const currentPollData = pollDataMap[pollId];
 
@@ -172,13 +178,11 @@ const EventItem: React.FC<EventItemProps> = ({
         }
       );
 
-      router.push('/events');
+      router.push("/events");
     } catch (error: any) {
       console.error("Error handling answer:", error.message);
     }
   };
-
-
 
   const handleOpenIndexChange = async (index: number | null) => {
     setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -189,18 +193,26 @@ const EventItem: React.FC<EventItemProps> = ({
       if (event.invited.length > 0 || event.going.length > 0) {
         try {
           const invitedEmailPromises = event.invited.map((userId) =>
-            axios.get(`https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`)
+            axios.get(
+              `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`
+            )
           );
 
           const goingEmailPromises = event.going.map((userId) =>
-            axios.get(`https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`)
+            axios.get(
+              `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`
+            )
           );
 
           const invitedEmails = await Promise.all(invitedEmailPromises);
           const goingEmails = await Promise.all(goingEmailPromises);
 
-          const invitedEmailList = invitedEmails.map((response) => response.data.email);
-          const goingEmailList = goingEmails.map((response) => response.data.email);
+          const invitedEmailList = invitedEmails.map(
+            (response) => response.data.email
+          );
+          const goingEmailList = goingEmails.map(
+            (response) => response.data.email
+          );
 
           setInvitedEmails(invitedEmailList);
           setGoingEmails(goingEmailList);
@@ -218,7 +230,6 @@ const EventItem: React.FC<EventItemProps> = ({
         <AccordionItem key={event.id}>
           <AccordionHeader onClick={() => handleOpenIndexChange(index)}>
             {event.name} <div>{openIndex === index ? "▲" : "▼"}</div>
-            
           </AccordionHeader>
           {openIndex === index && (
             <AccordionContent>
@@ -237,22 +248,40 @@ const EventItem: React.FC<EventItemProps> = ({
                           />
                           {votedPolls.includes(poll.id) && (
                             <>
-                              <RedText>You already voted for this poll.</RedText>
+                              <RedText>
+                                You already voted for this poll.
+                              </RedText>
                             </>
                           )}
-                          {!votedPolls.includes(poll.id) && (
+                          {!votedPolls.includes(poll.id) && poll.option_1 && (
                             <>
                               <RedText>Vote Here</RedText>
                               <VoteBtnContainer>
-                                <VoteBtn onClick={() => handleVote(poll.id, 1, event.id)}>
+                                <VoteBtn
+                                  onClick={() =>
+                                    handleVote(poll.id, 1, event.id)
+                                  }
+                                >
                                   {poll.option_1}
                                 </VoteBtn>
-                                <VoteBtn onClick={() => handleVote(poll.id, 2, event.id)}>
-                                  {poll.option_2}
-                                </VoteBtn>
-                                <VoteBtn onClick={() => handleVote(poll.id, 3, event.id)}>
-                                  {poll.option_3}
-                                </VoteBtn>
+                                {poll.option_2 && (
+                                  <VoteBtn
+                                    onClick={() =>
+                                      handleVote(poll.id, 2, event.id)
+                                    }
+                                  >
+                                    {poll.option_2}
+                                  </VoteBtn>
+                                )}
+                                {poll.option_3 && (
+                                  <VoteBtn
+                                    onClick={() =>
+                                      handleVote(poll.id, 3, event.id)
+                                    }
+                                  >
+                                    {poll.option_3}
+                                  </VoteBtn>
+                                )}
                               </VoteBtnContainer>
                             </>
                           )}
@@ -262,10 +291,10 @@ const EventItem: React.FC<EventItemProps> = ({
                   </ChartVoteContainer>
                 </>
               )}
-              {(title === "My Created Events" || title === "Invited Events") && (
+              {(title === "My Created Events" ||
+                title === "Invited Events") && (
                 <InvitedEmaisDisplay>
                   {invitedEmails.length > 0 && (
-                    
                     <GorOrNot>
                       <RedTextBig>Invited:</RedTextBig>
                       <EmailList>
@@ -275,7 +304,7 @@ const EventItem: React.FC<EventItemProps> = ({
                       </EmailList>
                     </GorOrNot>
                   )}
-                  
+
                   {goingEmails.length > 0 && (
                     <GorOrNot>
                       <RedTextBig>Going:</RedTextBig>
@@ -286,8 +315,7 @@ const EventItem: React.FC<EventItemProps> = ({
                       </EmailList>
                     </GorOrNot>
                   )}
-                  </InvitedEmaisDisplay>
-                
+                </InvitedEmaisDisplay>
               )}
               {title === "Invited Events" && (
                 <GorOrNot>
@@ -304,13 +332,17 @@ const EventItem: React.FC<EventItemProps> = ({
               )}
               {title === "My Created Events" && (
                 <GorOrNot>
-              <RedText>Edit and delete the event here</RedText>
-              <EditAndDelete>
-                <DeleteButton onClick={() => onDeleteEvent(event.id)}>Delete</DeleteButton>
-                <DeleteButton onClick={() => onEditEvent(event)}>Edit</DeleteButton>
-              </EditAndDelete>
-              </GorOrNot>
-            )}
+                  <RedText>Edit and delete the event here</RedText>
+                  <EditAndDelete>
+                    <DeleteButton onClick={() => onDeleteEvent(event.id)}>
+                      Delete
+                    </DeleteButton>
+                    <DeleteButton onClick={() => onEditEvent(event)}>
+                      Edit
+                    </DeleteButton>
+                  </EditAndDelete>
+                </GorOrNot>
+              )}
             </AccordionContent>
           )}
         </AccordionItem>
@@ -323,8 +355,6 @@ const EditAndDelete = styled.div`
   display: flex;
   gap: 10%;
   justify-content: center;
-
-
 `;
 
 const DeleteButton = styled.button`
@@ -365,7 +395,6 @@ const ChartVoteContainer = styled.div`
   @media screen and (max-width: 768px) {
     flex-direction: column;
   }
-
 `;
 const InvitedEmaisDisplay = styled.div`
   display: flex;
@@ -419,6 +448,7 @@ const ChartAndVote = styled.div`
 `;
 
 const AccordionContainer = styled.div`
+  text-align: center;
   min-width: 60%;
   display: flex;
   flex-direction: column;
@@ -428,7 +458,6 @@ const AccordionContainer = styled.div`
   @media screen and (max-width: 1280px) {
     width: 90%;
   }
-  
 `;
 
 const AccordionItem = styled.div`

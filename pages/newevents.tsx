@@ -285,7 +285,7 @@ const NewEvent: React.FC = () => {
               </BtnSmall>
 
               <BtnSmall onClick={() => handleRemovePollDisplay(pollIndex)}>
-                Remove Poll Display
+                Remove Poll
               </BtnSmall>
             </div>
           ))}

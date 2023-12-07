@@ -30,7 +30,7 @@ const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
     plugins: {
       legend: {
         labels: {
-          color: 'white', 
+          color: "#f64a45",
         },
       },
     },

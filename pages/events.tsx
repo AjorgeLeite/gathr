@@ -266,6 +266,7 @@ gap: 15px;
 const EventsPageContainer = styled.div`
   padding: 4%;
   width: 100%;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
