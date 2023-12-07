@@ -69,9 +69,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   return (
     <>
       <FormContainer>
-        <h2>Please Login Here: </h2>
+        <TextColor>Please Login Here: </TextColor>
         <FormStyle onSubmit={onLoginSubmit}>
           <TextInputs
+          className="txtinput"
             type="email"
             required
             placeholder="Email"
@@ -79,6 +80,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextInputs
+          className="txtinput"
             type="password"
             required
             placeholder="Password"
@@ -95,6 +97,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     </>
   );
 };
+
+const TextColor = styled.h2`
+color: #f3d8b6;
+`;
 
 const FormContainer = styled.div`
   gap: 20px;

@@ -16,8 +16,8 @@ export default function Home() {
           <HomepageBannerText>
             <h1>Welcome to gathr.</h1>
             <p>
-              Plan and decide together! gathr lets you effortlessly create
-              events with friends. Vote on activities and make every moment
+              Plan and decide together! <br/> gathr lets you effortlessly create
+              events with friends. <br/>Vote on activities and make every moment
               unforgettable. Start now!
             </p>
           </HomepageBannerText>
@@ -32,7 +32,7 @@ export default function Home() {
             ></Image>
           </FooterBar>
           <StyledImage
-            src={"/assets/1.jpg"}
+            src={"/assets/3.jpg"}
             alt={"gathr logo"}
             width={1000}
             height={600}
@@ -81,11 +81,29 @@ margin-top: 10%;
   min-height: 200px;
   z-index: 99;
   text-align: center;
+  
 
   @media screen and (max-width: 768px) {
 
     font-size: 28px;
-    margin-top: 35%;
+    margin-top: 30%;
+  }
+  @media screen and (max-width: 1280px) {
+
+  }
+  @media screen and (min-width: 1280px) {
+    margin-right: 40%;
+    width: 50%;
+    
+  }
+  @media screen and (min-width: 1800px) {
+    background-color: #f3ec78;
+    background-image: linear-gradient(45deg, #f3bc78, #f64a45);
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    -moz-text-fill-color: transparent;
   }
 
 `;
@@ -118,7 +136,13 @@ const HomepageInfoText = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  /* background-color: #f3d8b682;
+  border-radius: 20px; */
+  
 
+  @media screen and (max-width: 1280px) {
+    font-size: 18px;
+  }
   @media screen and (max-width: 768px) {
     font-size: 18px;
   }
