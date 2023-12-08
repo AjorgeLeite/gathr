@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styled from "styled-components";
 
+
 type EventItemProps = {
   title: string;
   event: Event;
@@ -51,6 +52,39 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitedUsers, setInvitedUsers] = useState<InvitedUser[]>([]);
   const [emailNotRegistered, setEmailNotRegistered] = useState(false);
+
+  const handleAddPoll = () => {
+    setUpdatedEvent((prevEvent) => ({
+      ...(prevEvent as Event),
+      polls_id: [
+        ...(prevEvent?.polls_id || []),
+        {
+          polls_id: 0,
+          id: 0,
+          created_at: 0,
+          name: "",
+          option_1: "",
+          option_2: "",
+          option_3: "",
+          vote_1: 0,
+          vote_2: 0,
+          vote_3: 0,
+          already_voted: [],
+        },
+      ],
+    }));
+  };
+
+  const handleDeletePoll = (pollIndex: number) => {
+    setUpdatedEvent((prevEvent) => {
+      const updatedPolls = [...(prevEvent?.polls_id || [])];
+      updatedPolls.splice(pollIndex, 1);
+      return {
+        ...(prevEvent as Event),
+        polls_id: updatedPolls,
+      };
+    });
+  };
 
   const handleRemoveInvite = (index: number) => {
     const updatedInvitedUsers = [...invitedUsers];
@@ -190,58 +224,118 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     <EventEditContainers>
       {updatedEvent ? (
         <>
-          <TextWarning>Editing event &quot;{updatedEvent.name}&quot; : </TextWarning>
+          <TextWarning>
+            Editing event &quot;{updatedEvent.name}&quot; :
+          </TextWarning>
           <CategoryContainer>
-          <InputContainer>
-          <label>Event Name:</label>
-          <InputStyled
-            type="text"
-            name="name"
-            value={updatedEvent?.name || ""}
-            onChange={handleInputChange}
-          />
-          </InputContainer>
+            <InputContainer>
+              <label>Event Name:</label>
+              <InputStyled
+                type="text"
+                name="name"
+                value={updatedEvent?.name || ""}
+                onChange={handleInputChange}
+              />
+            </InputContainer>
           </CategoryContainer>
           <CategoryContainer>
-          <InputContainer>
-          <label>Description:</label>
-          <InputStyled
-            name="description"
-            value={updatedEvent?.description || ""}
-            onChange={handleInputChange}
-          ></InputStyled>
-          </InputContainer>
+            <InputContainer>
+              <label>Description:</label>
+              <InputStyled
+                name="description"
+                value={updatedEvent?.description || ""}
+                onChange={handleInputChange}
+              ></InputStyled>
+            </InputContainer>
           </CategoryContainer>
           <EmailsContainer>
-          <label>Invited Emails:</label>
-
-          <ul>
-            {invitedUsers.map((user, index) => (
-              <EmailsDisplay key={index}>
-                {user.email}{" "}
-                <BtnSmallBeije onClick={() => handleRemoveInvite(index)}>
-                  Remove
-                </BtnSmallBeije>
-              </EmailsDisplay>
-            ))}
-          </ul>
-          
-          <InputContainer>
-          <InputStyled
-            type="text"
-            placeholder="Add new email"
-            value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
-          />
-          <BtnSmallBeije onClick={getUserIdByEmail}>Add Invite</BtnSmallBeije>
-          </InputContainer>
+            <label>Invited Emails:</label>
+            <EmailsDisplay>
+              {invitedUsers.map((user, index) => (
+                <EmailsDisplay key={index}>
+                  {user.email}{" "}
+                  <BtnSmallBeije
+                    onClick={() => handleRemoveInvite(index)}
+                  >
+                    Remove
+                  </BtnSmallBeije>
+                </EmailsDisplay>
+              ))}
+            </EmailsDisplay>
+            <InputContainer>
+              <InputStyled
+                type="text"
+                placeholder="Add new email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+              <BtnSmallBeije onClick={getUserIdByEmail}>
+                Add Invite
+              </BtnSmallBeije>
+            </InputContainer>
           </EmailsContainer>
           {emailNotRegistered && (
             <TextWarning>Email is not registered</TextWarning>
           )}
+          
+          <PollDisplay>
+            {updatedEvent.polls_id &&
+              updatedEvent.polls_id.map((poll, pollIndex) => (
+                <div key={pollIndex}>
+                  <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
+                  <p>{`Option 1: ${poll.option_1}`}</p>
+                  <p>{`Option 2: ${poll.option_2}`}</p>
+                  <p>{`Option 3: ${poll.option_3}`}</p>
+                  <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
+                    Delete Poll
+                  </BtnSmallBeije>
+                </div>
+              ))}
+            
+          </PollDisplay>
+<PollDisplay>
+<div>
+              
+              <InputContainer>
+                <label>Poll Name:</label>
+                <InputStyled
+                  type="text"
+                  name="newPoll.name"
+                  onChange={handleInputChange}
+                />
+              </InputContainer>
+              <InputContainer>
+                <label>Option 1:</label>
+                <InputStyled
+                  type="text"
+                  name="newPoll.option_1"
+                  onChange={handleInputChange}
+                />
+              </InputContainer>
+              <InputContainer>
+                <label>Option 2:</label>
+                <InputStyled
+                  type="text"
+                  name="newPoll.option_2"
+                  onChange={handleInputChange}
+                />
+              </InputContainer>
+              <InputContainer>
+                <label>Option 3:</label>
+                <InputStyled
+                  type="text"
+                  name="newPoll.option_3"
+                  onChange={handleInputChange}
+                />
+              </InputContainer>
+              <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
+            </div>
+</PollDisplay>
           <InputContainer>
-          <BtnMedium onClick={() => handleSaveEvent(updatedEvent)}>Edit Event</BtnMedium>
-          <BtnMedium onClick={onCancel}>Cancel</BtnMedium>
+            <BtnMedium onClick={() => handleSaveEvent(updatedEvent)}>
+              Edit Event
+            </BtnMedium>
+            <BtnMedium onClick={onCancel}>Cancel</BtnMedium>
           </InputContainer>
         </>
       ) : (
@@ -250,41 +344,63 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           alt="gathr logo"
           width={70}
           height={70}
-        ></Image>
+        />
       )}
     </EventEditContainers>
   );
 };
 
-const InputStyled = styled.input`
-background-color: #f3d8b6;
-padding: 5px;
-color: grey;
-border-radius: 10px;
-border: 0px;
-min-height: 40px;
+const PollDisplay = styled.div`
+  width: 40%;
+  display: flex;
+  gap: 2%;
+  justify-content: center;
+  align-items: center;
+  background-color: #f57265;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  color: #f3d8b6;
+text-align: center;
+  @media screen and (max-width: 1280px) {
+    width: 60%;
+  }
+
+  @media screen and (max-width: 728px) {
+    width: 80%;
+  }
 `;
 
+
+const InputStyled = styled.input`
+  background-color: #f3d8b6;
+  padding: 5px;
+  color: grey;
+  border-radius: 10px;
+  border: 0.5px solid #fbaf85;
+  margin-bottom: 10px;
+  font-family: inherit;
+`;
 
 const TextWarning = styled.h3`
   color: #f64a45;
 `;
 
 const EventEditContainers = styled.div`
-display: flex;
-flex-direction: column;
-width: 100%;
-height: 50vh;
-align-items: center;
-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+min-height: 60vh;
+  align-items: center;
+  gap: 10px;
 `;
 
 const InputContainer = styled.div`
-width: 100%;
-display: flex;
-gap: 2%;
-justify-content: center;
-align-items: center;
+  width: 100%;
+  display: flex;
+  gap: 2%;
+  justify-content: center;
+  align-items: center;
 `;
 
 const BtnSmall = styled.button`
@@ -302,6 +418,7 @@ const BtnSmall = styled.button`
     color: #f3d8b6;
   }
 `;
+
 const BtnMedium = styled.button`
   padding: 10px;
   width: auto;
@@ -334,53 +451,57 @@ const BtnSmallBeije = styled.button`
   }
 `;
 
-  const CategoryContainer = styled.div`
+const CategoryContainer = styled.div`
   padding: 10px;
-    width: 40%;
-    height: auto;
-    min-height: 15%;
-    background-color: #f57265;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    color: #f3d8b6;
+  width: 40%;
+  height: auto;
+  min-height: 15%;
+  background-color: #f57265;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  color: #f3d8b6;
 
-    @media screen and (max-width: 1280px) {
+  @media screen and (max-width: 1280px) {
     width:60%;
   }
   @media screen and (max-width: 728px) {
     width:80%;
   }
-  `;
+`;
+
 const EmailsContainer = styled.div`
-width: 40%;
-height: auto;
-min-height: 10%;
-background-color: #f57265;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-border-radius: 10px;
-padding: 10px;
-gap:10px;
-color:#f3d8b6;
+  width: 40%;
+  height: auto;
+  min-height: 10%;
+  background-color: #f57265;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 10px;
+  gap:10px;
+  color:#f3d8b6;
 
-@media screen and (max-width: 1280px) {
+  @media screen and (max-width: 1280px) {
     width:60%;
   }
   @media screen and (max-width: 728px) {
     width:80%;
   }
-
 `;
 
 const EmailsDisplay = styled.div`
-width: 100%;
-display: flex;
-gap: 45%;
-justify-content: center;
+  width: 100%;
+  display: flex;
+  gap: 5%;
+  justify-content: center;
+  flex-direction: row;
+  padding-left: 5%;
+  padding-right: 5%;
+  
 `;
 
 export default EditEvent;

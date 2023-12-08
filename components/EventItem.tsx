@@ -225,7 +225,9 @@ const EventItem: React.FC<EventItemProps> = ({
 
   return (
     <AccordionContainer>
-      <RedTextBig>{title}</RedTextBig>
+      <TitleContainer>
+        <EventCategoryTitle>{title}</EventCategoryTitle>
+      </TitleContainer>
       {events.map((event, index) => (
         <AccordionItem key={event.id}>
           <AccordionHeader onClick={() => handleOpenIndexChange(index)}>
@@ -351,6 +353,19 @@ const EventItem: React.FC<EventItemProps> = ({
   );
 };
 
+const EventCategoryTitle = styled.text`
+  color: #f64a45;
+  font-size: 22px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #f64a45;
+  width: 20%;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const EditAndDelete = styled.div`
   display: flex;
   gap: 10%;

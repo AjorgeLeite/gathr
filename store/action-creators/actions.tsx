@@ -5,7 +5,12 @@ export const LOGOUT = 'LOGOUT';
 
 export const loginSuccess = (name: string, userId: number) => ({
   type: LOGIN_SUCCESS,
-  payload: { name, userId },
+  payload: {
+    name,
+    userId,
+    errorMessage: null, 
+    events: null,
+  },
 });
 
 export const loginFailure = (errorMessage: any) => ({
