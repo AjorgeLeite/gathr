@@ -60,9 +60,12 @@ const Navbar = () => {
 
 
           <MobileMenuButton onClick={toggleMobileMenu}>
-            <div></div>
-            <div></div>
-            <div></div>
+          <BurgerIcon
+              src="/assets/burgericon.gif"
+              alt="gathr logo"
+              width={50}
+              height={30}
+            />
           </MobileMenuButton>
         </LogoContainer>
 
@@ -185,6 +188,10 @@ const StyledImage = styled(Image)`
   align-items: center;
   justify-content: center;
   animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
+`;
+const BurgerIcon = styled(Image)`
+  width: 40px;
+  height: 25px;
 `;
 
 const NavbarBtn = styled.button`

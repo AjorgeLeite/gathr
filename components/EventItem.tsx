@@ -293,12 +293,10 @@ const EventItem: React.FC<EventItemProps> = ({
                   </ChartVoteContainer>
                 </>
               )}
-              {(title === "My Created Events" ||
-                title === "Invited Events") && (
                 <InvitedEmaisDisplay>
                   {invitedEmails.length > 0 && (
                     <GorOrNot>
-                      <RedTextBig>Invited:</RedTextBig>
+                      <RedTextBig>Invited to the event:</RedTextBig>
                       <EmailList>
                         {invitedEmails.map((email) => (
                           <RedText key={email}>{email}</RedText>
@@ -309,7 +307,7 @@ const EventItem: React.FC<EventItemProps> = ({
 
                   {goingEmails.length > 0 && (
                     <GorOrNot>
-                      <RedTextBig>Going:</RedTextBig>
+                      <RedTextBig>Going to the event:</RedTextBig>
                       <EmailList>
                         {goingEmails.map((email) => (
                           <RedText key={email}>{email}</RedText>
@@ -318,7 +316,6 @@ const EventItem: React.FC<EventItemProps> = ({
                     </GorOrNot>
                   )}
                 </InvitedEmaisDisplay>
-              )}
               {title === "Invited Events" && (
                 <GorOrNot>
                   <RedText>Can we count you in?</RedText>
@@ -476,9 +473,10 @@ const AccordionContainer = styled.div`
 `;
 
 const AccordionItem = styled.div`
-  border-radius: 2%;
+  border-radius: 10px;
   overflow: hidden;
   animation: fadeInUp 0.5s ease-in-out;
+  transition: background-color 0.3s ease-in-out;
 
   @keyframes fadeInUp {
     from {
@@ -490,6 +488,14 @@ const AccordionItem = styled.div`
       opacity: 1;
     }
   }
+
+  &:hover {
+    background-color: #f57265; 
+  }
+
+  &:not(:hover) {
+    transition: background-color 0.3s ease-in-out;
+  }
 `;
 
 const AccordionHeader = styled.div`
@@ -499,8 +505,10 @@ const AccordionHeader = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-around;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out; 
+
   &:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px);
   }
 `;
 

@@ -32,19 +32,27 @@ const Footer = () => {
     </>
   );
 };
-
-const StyledImage = styled(Image)`
-  animation: fadeInUp 0.5s ease-in-out;
-  @keyframes fadeInUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+const swing = keyframes`
+  0% {
+    transform: rotate(0deg);
   }
+  50% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+`;
+const swingWithDelay = keyframes`
+  0%, 100% {
+    transform: rotate(3deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+`;
+const StyledImage = styled(Image)`
+  animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
  
 `;
 const FooterStyle = styled.footer`
