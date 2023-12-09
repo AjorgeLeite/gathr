@@ -192,7 +192,6 @@ const HomepageInfoText = styled.div`
 
 `;
 const StyledLogo = styled(Image)`
-animation: ${slideInRightToLeft} 1s ease-in-out;
 animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
 margin-top: -5px;
   position: absolute;
@@ -210,5 +209,15 @@ const StyledImage = styled(Image)`
   object-fit: cover;
 `;
 const StyledImageAnimated = styled(Image)`
-  animation: ${slideInLeftToRight} 1s ease-in-out;
+    animation: fadeInUp 0.5s ease-in-out;
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;

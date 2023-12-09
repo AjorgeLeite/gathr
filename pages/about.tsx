@@ -66,6 +66,17 @@ const StyledImage = styled(Image)`
   width: auto;
   height: 80vh;
   position: absolute;
+  animation: fadeInUp 0.5s ease-in-out;
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
 
 const AboutText = styled.div`

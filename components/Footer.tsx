@@ -32,16 +32,19 @@ const Footer = () => {
     </>
   );
 };
-const slideInLeftToRight = keyframes`
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0%);
-  }
-`;
+
 const StyledImage = styled(Image)`
-animation: ${slideInLeftToRight} 1s ease-in-out;
+  animation: fadeInUp 0.5s ease-in-out;
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
  
 `;
 const FooterStyle = styled.footer`
