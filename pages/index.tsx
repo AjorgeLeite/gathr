@@ -1,5 +1,5 @@
 import Image from "next/image";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import LoginRegisterComp from "@/components/LoginRegisterComp";
 
 export default function Home() {
@@ -24,12 +24,12 @@ export default function Home() {
         </HomepageBanner>
         <HomepageInfo>
           <FooterBar>
-            <Image
+            <StyledImageAnimated
               src="/assets/LOGOPNGBEIJE.png"
               alt="gathr logo"
               width={80}
               height={35}
-            ></Image>
+            ></StyledImageAnimated>
           </FooterBar>
           <StyledImage
             src={"/assets/3.jpg"}
@@ -48,6 +48,43 @@ export default function Home() {
     </>
   );
 }
+const swing = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+`;
+
+const swingWithDelay = keyframes`
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+`;
+const slideInLeftToRight = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+`;
+const slideInRightToLeft = keyframes`
+  from {
+    transform: translateX(+100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+`;
+
 const FooterBar = styled.div`
   height: 50px;
   background-color: #f64a45;
@@ -78,7 +115,7 @@ const HomepageBanner = styled.div`
 min-height: 800px;
 `;
 const HomepageBannerText = styled.div`
-
+animation: ${slideInLeftToRight} 1s ease-in-out;
 margin-top: 10%;
   font-size: 35px;
   min-width: 35%;
@@ -155,6 +192,8 @@ const HomepageInfoText = styled.div`
 
 `;
 const StyledLogo = styled(Image)`
+animation: ${slideInRightToLeft} 1s ease-in-out;
+animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
 margin-top: -5px;
   position: absolute;
   top: 0;
@@ -169,4 +208,7 @@ const StyledImage = styled(Image)`
   width: 100%;
   height: 100%;
   object-fit: cover;
+`;
+const StyledImageAnimated = styled(Image)`
+  animation: ${slideInLeftToRight} 1s ease-in-out;
 `;

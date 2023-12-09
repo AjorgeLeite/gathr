@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import Link from "next/link";
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/action-creators/actions';
@@ -159,13 +159,32 @@ const NavbarLinks = styled.div`
     display: none; 
   }
 `;
-
+const swing = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+`;
+const swingWithDelay = keyframes`
+  0%, 100% {
+    transform: rotate(3deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+`;
 const StyledImage = styled(Image)`
   width: 150px;
   height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
 `;
 
 const NavbarBtn = styled.button`
@@ -254,7 +273,6 @@ const MobileMenu = styled.div`
   color: #f64a45;
   padding: 10px;
 `;
-
 
 
 export default Navbar;

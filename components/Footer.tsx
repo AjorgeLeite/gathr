@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,12 +7,12 @@ const Footer = () => {
     <>
       <FooterStyle>
         <FooterBar>
-          <Image
+          <StyledImage
             src="/assets/LOGOPNGBEIJE.png"
             alt="gathr logo"
             width={80}
             height={35}
-          ></Image>
+          ></StyledImage>
         </FooterBar>
         <FooterLinks>
           <Link href={"/about"}>
@@ -23,16 +23,27 @@ const Footer = () => {
           </Link>
         </FooterLinks>
         <FooterInfo>
-          <p>Copyright © 2021 Gathr</p>
-          <p>All Rights Reserved</p>
-          <p>Terms of Service</p>
-          <p>Privacy Policy</p>
+          <Link href={"#"}><p>Copyright © 2021 Gathr</p></Link>
+          <Link href={"#"}><p>All Rights Reserved</p></Link>
+          <Link href={"#"}><p>Terms of Service</p></Link>
+          <Link href={"#"}><p>Privacy Policy</p></Link>
         </FooterInfo>
       </FooterStyle>
     </>
   );
 };
-
+const slideInLeftToRight = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+`;
+const StyledImage = styled(Image)`
+animation: ${slideInLeftToRight} 1s ease-in-out;
+ 
+`;
 const FooterStyle = styled.footer`
   width: 100%;
   height: auto;
@@ -94,6 +105,8 @@ const FooterAnimatedLinks = styled.div`
     }
   }
 `;
+
+
 const FooterInfo = styled.div`
   display: flex;
   justify-content: space-around;

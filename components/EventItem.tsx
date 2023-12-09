@@ -358,7 +358,7 @@ const EventCategoryTitle = styled.text`
   font-size: 22px;
   margin-bottom: 5px;
   border-bottom: 1px solid #f64a45;
-  width: 20%;
+  width: auto;
 `;
 
 const TitleContainer = styled.div`
@@ -478,6 +478,18 @@ const AccordionContainer = styled.div`
 const AccordionItem = styled.div`
   border-radius: 2%;
   overflow: hidden;
+  animation: fadeInUp 0.5s ease-in-out;
+
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
 
 const AccordionHeader = styled.div`
@@ -487,6 +499,9 @@ const AccordionHeader = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-around;
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const AccordionContent = styled.div`
