@@ -1,16 +1,11 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 
 const About = () => {
   return (
     <>
       <AboutContainer>
-        <StyledImage
-          src={"/assets/aboutbg.jpg"}
-          alt={"About"}
-          width={1000}
-          height={600}
-        ></StyledImage>
+        
 
         <AboutText>
           <h1>Welcome to gathr!</h1>
@@ -57,39 +52,53 @@ const About = () => {
             
 
         </AboutText>
+        <StyledImage
+          src={"/assets/aboutbg.jpg"}
+          alt={"About"}
+          width={1000}
+          height={600}
+        ></StyledImage>
       </AboutContainer>
     </>
   );
 };
-
+const slideInLeftToRight = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+`;
+const slideInRightToLeft = keyframes`
+  from {
+    transform: translateX(+100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+`;
 const StyledImage = styled(Image)`
   width: auto;
   height: 80vh;
-  position: absolute;
-  animation: fadeInUp 0.5s ease-in-out;
-  @keyframes fadeInUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+  animation: ${slideInRightToLeft} 1s ease-in-out;
+  @media screen and (max-width: 768px) {
+    position: absolute;
   }
 `;
 
 const AboutText = styled.div`
+animation: ${slideInLeftToRight} 1s ease-in-out;
   padding-top: 5%;
   padding-bottom: 5%;
   text-align: center;
-  width: 70%;
+  width: 45%;
   position: relative;
   z-index: 99;
   font-size: 18px;
   @media screen and (max-width: 768px) {
     font-weight: 600;
-    
+    width: 70%;
   }
 `;
 
