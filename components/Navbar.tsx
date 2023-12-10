@@ -8,8 +8,9 @@ import { useRouter } from "next/router";
 import { destroyCookie } from 'nookies';
 
 interface NavbarStyleProps extends React.HTMLAttributes<HTMLDivElement> {
-  mobileMenuOpen?: boolean;
+  $mobileMenuOpen?: boolean; 
 }
+
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,7 +47,7 @@ const Navbar = () => {
 
   return (
     <>
-      <NavbarStyle mobileMenuOpen={mobileMenuOpen}>
+      <NavbarStyle $mobileMenuOpen={mobileMenuOpen}>
 
         <LogoContainer>
           <Link href={"/"}>
@@ -140,7 +141,7 @@ const NavbarStyle: React.FC<NavbarStyleProps> = styled.nav<NavbarStyleProps>`
   }
 
   ${(props) =>
-    props.mobileMenuOpen &&
+    props.$mobileMenuOpen &&
     css`
       @media (max-width: 768px) {
         height: auto;
