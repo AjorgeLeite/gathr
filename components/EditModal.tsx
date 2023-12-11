@@ -278,22 +278,26 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
             <TextWarning>Email is not registered</TextWarning>
           )}
           
-          <PollDisplay>
+          <PollDisplayContainer>
             {updatedEvent.polls_id &&
               updatedEvent.polls_id.map((poll, pollIndex) => (
-                <div key={pollIndex}>
+                <PollDisplay key={pollIndex}>
                   <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
                   <p>{`Option 1: ${poll.option_1}`}</p>
+                  <p>{`Votes: ${poll.vote_1}`}</p>
                   <p>{`Option 2: ${poll.option_2}`}</p>
+                  <p>{`Votes:${poll.vote_2}`}</p>
                   <p>{`Option 3: ${poll.option_3}`}</p>
+                  <p>{`Votes: ${poll.vote_3}`}</p>
+                  <br/>
                   <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
                     Delete Poll
                   </BtnSmallBeije>
-                </div>
+                </PollDisplay>
               ))}
             
-          </PollDisplay>
-<PollDisplay>
+          </PollDisplayContainer>
+<PollDisplayContainer>
 <div>
               
               <InputContainer>
@@ -330,7 +334,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
               </InputContainer>
               <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
             </div>
-</PollDisplay>
+</PollDisplayContainer>
           <InputContainer>
             <BtnMedium onClick={() => handleSaveEvent(updatedEvent)}>
               Edit Event
@@ -351,6 +355,19 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 };
 
 const PollDisplay = styled.div`
+  border: 1px solid #f3d8b6;
+  border-radius: 20px;
+  padding: 20px;
+  
+  @media screen and (max-width: 1280px) {
+    
+  }
+
+  @media screen and (max-width: 728px) {
+    margin-top: 20px;
+  }
+`;
+const PollDisplayContainer = styled.div`
   width: 40%;
   display: flex;
   gap: 2%;
@@ -364,6 +381,7 @@ const PollDisplay = styled.div`
 text-align: center;
   @media screen and (max-width: 1280px) {
     width: 60%;
+    flex-direction: column;
   }
 
   @media screen and (max-width: 728px) {

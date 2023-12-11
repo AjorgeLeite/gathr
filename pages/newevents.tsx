@@ -248,7 +248,7 @@ const NewEvent: React.FC = () => {
         <PollsContainer>
           <h2>Polls:</h2>
           {polls.map((poll, pollIndex) => (
-            <div key={pollIndex}>
+            <PoolWindow key={pollIndex}>
               <label>Poll Name:</label>
               <input
                 type="text"
@@ -287,7 +287,7 @@ const NewEvent: React.FC = () => {
               <BtnSmall onClick={() => handleRemovePollDisplay(pollIndex)}>
                 Remove Poll
               </BtnSmall>
-            </div>
+            </PoolWindow>
           ))}
           
           {polls.length < 3 && addedPolls.length < 3 && (
@@ -314,6 +314,12 @@ const NewEvent: React.FC = () => {
     </NewEventContainer>
   );
 };
+
+const PoolWindow = styled.div`
+
+
+`;
+
 
 const AddedPollDisplay = styled.div`
 display: flex;
@@ -445,6 +451,7 @@ const BtnSmallBeije = styled.button`
 `;
 
   const CategoryContainer = styled.div`
+  gap:10px;
   padding: 10px;
     width: 100%;
     height: auto;
@@ -455,6 +462,9 @@ const BtnSmallBeije = styled.button`
     align-items: center;
     border-radius: 10px;
     color: #f3d8b6;
+    @media screen and (max-width: 768px) {
+    flex-direction: column;
+    }
   `;
   const InvitedEmails = styled.div`
   padding: 10px;
@@ -470,6 +480,7 @@ const BtnSmallBeije = styled.button`
     flex-direction: column;
   `;
   const PollsContainer = styled.div`
+  
   padding: 15px;
   width: 100%;
   min-height: 15%;
