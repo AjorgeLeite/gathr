@@ -412,6 +412,9 @@ const InvitedEmaisDisplay = styled.div`
   display: flex;
   gap: 5%;
   justify-content: center;
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const GorOrNot = styled.div`
@@ -423,6 +426,9 @@ const GorOrNot = styled.div`
   flex-direction: column;
   gap: 5%;
   justify-content: center;
+  @media screen and (max-width: 768px) {
+   margin-top: 10px;
+  }
 `;
 
 const VoteBtn = styled.button`
