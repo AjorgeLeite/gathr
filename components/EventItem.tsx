@@ -403,9 +403,11 @@ const ChartVoteContainer = styled.div`
   display: flex;
   gap: 5%;
   justify-content: center;
-
+  flex-wrap: wrap;
+  width: 100%;
   @media screen and (max-width: 768px) {
     flex-direction: column;
+    width: auto;
   }
 `;
 const InvitedEmaisDisplay = styled.div`
@@ -531,12 +533,7 @@ const AccordionContent = styled.div`
   align-items: center;
   text-align: center;
   gap: 10px;
-  width: 1000px;
 
-  @media screen and (max-width: 1280px) {
-    width: 100%;
-    flex-wrap: wrap;
-  }
 `;
 
 const ButtonContainer = styled.div`
