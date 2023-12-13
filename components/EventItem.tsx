@@ -6,8 +6,13 @@ import { useSelector } from "react-redux";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
 type Poll = {
-  polls_id: number;
   id: number;
   created_at: number;
   name: string;
@@ -18,6 +23,7 @@ type Poll = {
   vote_2: number;
   vote_3: number;
   already_voted: number[];
+  polls_id?: number[];
 };
 
 type Event = {
@@ -26,9 +32,22 @@ type Event = {
   created_by: number;
   name: string;
   description: string;
-  going: number[];
-  invited: number[];
+  going: User[];
+  invited: User[];
   polls_id?: Poll[];
+  newPoll?: {
+    id: number;
+    created_at: number;
+    name: string;
+    option_1: string;
+    option_2: string;
+    option_3: string;
+    vote_1: number;
+    vote_2: number;
+    vote_3: number;
+    already_voted: number[];
+    polls_id?: number[];
+  };
 };
 
 type EventItemProps = {
@@ -191,34 +210,11 @@ const EventItem: React.FC<EventItemProps> = ({
       const event = events[index];
 
       if (event.invited.length > 0 || event.going.length > 0) {
-        try {
-          const invitedEmailPromises = event.invited.map((userId) =>
-            axios.get(
-              `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`
-            )
-          );
+        const invitedEmails = event.invited.map((user) => user.email);
+        const goingEmails = event.going.map((user) => user.email);
 
-          const goingEmailPromises = event.going.map((userId) =>
-            axios.get(
-              `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${userId}`
-            )
-          );
-
-          const invitedEmails = await Promise.all(invitedEmailPromises);
-          const goingEmails = await Promise.all(goingEmailPromises);
-
-          const invitedEmailList = invitedEmails.map(
-            (response) => response.data.email
-          );
-          const goingEmailList = goingEmails.map(
-            (response) => response.data.email
-          );
-
-          setInvitedEmails(invitedEmailList);
-          setGoingEmails(goingEmailList);
-        } catch (error) {
-          console.error("Error fetching user emails:", error);
-        }
+        setInvitedEmails(invitedEmails);
+        setGoingEmails(goingEmails);
       }
     }
   };
@@ -231,7 +227,8 @@ const EventItem: React.FC<EventItemProps> = ({
       {events.map((event, index) => (
         <AccordionItem key={event.id}>
           <AccordionHeader onClick={() => handleOpenIndexChange(index)}>
-            {event.name} <div>{openIndex === index ? "▲" : "▼"}</div>
+            <div>{event.name}</div>{" "}
+            <OpenClose>{openIndex === index ? "▲" : "▼"}</OpenClose>
           </AccordionHeader>
           {openIndex === index && (
             <AccordionContent>
@@ -293,29 +290,29 @@ const EventItem: React.FC<EventItemProps> = ({
                   </ChartVoteContainer>
                 </>
               )}
-                <InvitedEmaisDisplay>
-                  {invitedEmails.length > 0 && (
-                    <GorOrNot>
-                      <RedTextBig>Invited to the event:</RedTextBig>
-                      <EmailList>
-                        {invitedEmails.map((email) => (
-                          <RedText key={email}>{email}</RedText>
-                        ))}
-                      </EmailList>
-                    </GorOrNot>
-                  )}
+              <InvitedEmaisDisplay>
+                {invitedEmails.length > 0 && (
+                  <GorOrNot>
+                    <RedTextBig>Invited to the event:</RedTextBig>
+                    <EmailList>
+                      {invitedEmails.map((email) => (
+                        <RedText key={email}>{email}</RedText>
+                      ))}
+                    </EmailList>
+                  </GorOrNot>
+                )}
 
-                  {goingEmails.length > 0 && (
-                    <GorOrNot>
-                      <RedTextBig>Going to the event:</RedTextBig>
-                      <EmailList>
-                        {goingEmails.map((email) => (
-                          <RedText key={email}>{email}</RedText>
-                        ))}
-                      </EmailList>
-                    </GorOrNot>
-                  )}
-                </InvitedEmaisDisplay>
+                {goingEmails.length > 0 && (
+                  <GorOrNot>
+                    <RedTextBig>Going to the event:</RedTextBig>
+                    <EmailList>
+                      {goingEmails.map((email) => (
+                        <RedText key={email}>{email}</RedText>
+                      ))}
+                    </EmailList>
+                  </GorOrNot>
+                )}
+              </InvitedEmaisDisplay>
               {title === "Invited Events" && (
                 <GorOrNot>
                   <RedText>Can we count you in?</RedText>
@@ -349,7 +346,10 @@ const EventItem: React.FC<EventItemProps> = ({
     </AccordionContainer>
   );
 };
-
+const OpenClose = styled.div`
+  margin-left: 30%;
+  position: absolute;
+`;
 const EventCategoryTitle = styled.text`
   color: #f64a45;
   font-size: 22px;
@@ -378,22 +378,22 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-const BeijeTitle = styled.text`
+const BeijeTitle = styled.span`
   color: #f3d8b6;
   font-size: 36px;
 `;
 
-const BeijeText = styled.text`
+const BeijeText = styled.span`
   color: #f3d8b6;
   font-size: 22px;
 `;
 
-const RedText = styled.text`
+const RedText = styled.span`
   color: #f64a45;
   font-size: 16px;
   margin-bottom: 5px;
 `;
-const RedTextBig = styled.text`
+const RedTextBig = styled.span`
   color: #f64a45;
   font-size: 22px;
   margin-bottom: 5px;
@@ -427,7 +427,7 @@ const GorOrNot = styled.div`
   gap: 5%;
   justify-content: center;
   @media screen and (max-width: 768px) {
-   margin-top: 10px;
+    margin-top: 10px;
   }
 `;
 
@@ -463,6 +463,10 @@ const ChartAndVote = styled.div`
   padding-bottom: 5%;
   background-color: #f3d8b6be;
   border-radius: 5%;
+  @media screen and (max-width: 1280px) {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 `;
 
 const AccordionContainer = styled.div`
@@ -472,9 +476,9 @@ const AccordionContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   justify-content: center;
-
   @media screen and (max-width: 1280px) {
     width: 90%;
+    flex-wrap: wrap;
   }
 `;
 
@@ -496,7 +500,7 @@ const AccordionItem = styled.div`
   }
 
   &:hover {
-    background-color: #f57265; 
+    background-color: #f57265;
   }
 
   &:not(:hover) {
@@ -511,7 +515,7 @@ const AccordionHeader = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-around;
-  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out; 
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
 
   &:hover {
     transform: translateY(-5px);
@@ -527,6 +531,12 @@ const AccordionContent = styled.div`
   align-items: center;
   text-align: center;
   gap: 10px;
+  width: 1000px;
+
+  @media screen and (max-width: 1280px) {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 `;
 
 const ButtonContainer = styled.div`

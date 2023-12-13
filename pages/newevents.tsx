@@ -18,9 +18,9 @@ type PollOption = {
 };
 
 const NewEvent: React.FC = () => {
-  const [eventName, setEventName] = useState<string>('');
-  const [eventDescription, setEventDescription] = useState<string>('');
-  const [inviteEmail, setInviteEmail] = useState<string>('');
+  const [eventName, setEventName] = useState<string>("");
+  const [eventDescription, setEventDescription] = useState<string>("");
+  const [inviteEmail, setInviteEmail] = useState<string>("");
   const [invitedUsers, setInvitedUsers] = useState<InvitedUser[]>([]);
   const [polls, setPolls] = useState<PollOption[]>([]);
   const [addedPolls, setAddedPolls] = useState<PollOption[]>([]);
@@ -29,17 +29,23 @@ const NewEvent: React.FC = () => {
   const userId = useSelector((state: any) => state.user.user.userId);
   const { authToken } = parseCookies();
   const router = useRouter();
-  
+
   const handleAddInvite = async () => {
-    if (inviteEmail.trim() !== '' && !invitedUsers.some(user => user.email === inviteEmail)) {
+    if (
+      inviteEmail.trim() !== "" &&
+      !invitedUsers.some((user) => user.email === inviteEmail)
+    ) {
       try {
         const response = await axios.get(
           `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user?email=${inviteEmail}`
         );
 
         const invitedUserId = response.data[0].id;
-        setInvitedUsers([...invitedUsers, { email: inviteEmail, invitedUserId }]);
-        setInviteEmail('');
+        setInvitedUsers([
+          ...invitedUsers,
+          { email: inviteEmail, invitedUserId },
+        ]);
+        setInviteEmail("");
       } catch (error) {
         console.error("Error fetching user id:", error);
       }
@@ -47,17 +53,26 @@ const NewEvent: React.FC = () => {
   };
 
   const handleDeleteInvite = (emailToDelete: string) => {
-    const updatedInvitedUsers = invitedUsers.filter((user) => user.email !== emailToDelete);
+    const updatedInvitedUsers = invitedUsers.filter(
+      (user) => user.email !== emailToDelete
+    );
     setInvitedUsers(updatedInvitedUsers);
   };
 
-  const handlePollNameChange = (e: React.ChangeEvent<HTMLInputElement>, pollIndex: number) => {
+  const handlePollNameChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    pollIndex: number
+  ) => {
     const updatedPolls = [...polls];
     updatedPolls[pollIndex].name = e.target.value;
     setPolls(updatedPolls);
   };
 
-  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>, pollIndex: number, optionIndex: number) => {
+  const handleOptionChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    pollIndex: number,
+    optionIndex: number
+  ) => {
     const updatedPolls = [...polls];
     updatedPolls[pollIndex].options[optionIndex] = e.target.value;
     setPolls(updatedPolls);
@@ -66,7 +81,7 @@ const NewEvent: React.FC = () => {
   const handleAddOption = (pollIndex: number) => {
     const updatedPolls = [...polls];
     if (updatedPolls[pollIndex].options.length < 3) {
-      updatedPolls[pollIndex].options.push('');
+      updatedPolls[pollIndex].options.push("");
       setPolls(updatedPolls);
     }
   };
@@ -79,7 +94,7 @@ const NewEvent: React.FC = () => {
 
   const handleAddPoll = () => {
     if (polls.length < 3) {
-      setPolls((prevPolls) => [...prevPolls, { name: '', options: [''] }]);
+      setPolls((prevPolls) => [...prevPolls, { name: "", options: [""] }]);
     }
   };
 
@@ -103,9 +118,17 @@ const NewEvent: React.FC = () => {
       );
 
       const createdPollOption = response.data;
-      setAddedPolls((prevAddedPolls) => [...prevAddedPolls, { ...selectedPoll, pollOptionId: createdPollOption.id }]);
-      setPollOptionIds((prevPollOptionIds) => [...prevPollOptionIds, createdPollOption.id]);
-      setPolls((prevPolls) => prevPolls.filter((_, index) => index !== pollIndex));
+      setAddedPolls((prevAddedPolls) => [
+        ...prevAddedPolls,
+        { ...selectedPoll, pollOptionId: createdPollOption.id },
+      ]);
+      setPollOptionIds((prevPollOptionIds) => [
+        ...prevPollOptionIds,
+        createdPollOption.id,
+      ]);
+      setPolls((prevPolls) =>
+        prevPolls.filter((_, index) => index !== pollIndex)
+      );
 
       return createdPollOption.id;
     } catch (error) {
@@ -127,10 +150,14 @@ const NewEvent: React.FC = () => {
       updatedPolls.splice(pollIndex, 1);
       setPolls(updatedPolls);
 
-      const updatedAddedPolls = addedPolls.filter((_, index) => index !== pollIndex);
+      const updatedAddedPolls = addedPolls.filter(
+        (_, index) => index !== pollIndex
+      );
       setAddedPolls(updatedAddedPolls);
 
-      const updatedPollOptionIds = pollOptionIds.filter((id) => id !== pollOptionIdToRemove);
+      const updatedPollOptionIds = pollOptionIds.filter(
+        (id) => id !== pollOptionIdToRemove
+      );
       setPollOptionIds(updatedPollOptionIds);
     } catch (error) {
       console.error("Error removing poll:", error);
@@ -138,7 +165,9 @@ const NewEvent: React.FC = () => {
   };
 
   const handleRemovePollDisplay = (pollIndex: number) => {
-    const updatedAddedPolls = addedPolls.filter((_, index) => index !== pollIndex);
+    const updatedAddedPolls = addedPolls.filter(
+      (_, index) => index !== pollIndex
+    );
     const updatedPolls = polls.filter((_, index) => index !== pollIndex);
 
     setAddedPolls(updatedAddedPolls);
@@ -173,12 +202,10 @@ const NewEvent: React.FC = () => {
         }
       );
 
-      const newEvent = eventResponse.data;
-
       for (let i = 0; i < addedPolls.length; i++) {
         const pollId = pollIds[i];
         const pollOptionId = addedPolls[i].pollOptionId;
-  
+
         await axios.patch(
           `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${pollOptionId}`,
           {
@@ -194,8 +221,8 @@ const NewEvent: React.FC = () => {
           }
         );
       }
-      
-      router.push("/events")
+
+      router.push("/events");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -206,39 +233,41 @@ const NewEvent: React.FC = () => {
       <RedTextBig>Create a New Event</RedTextBig>
       <FormContainer>
         <CategoryContainer>
-        <label>Event Name:</label>
-        <InputStyled
-          type="text"
-          placeholder="Add a name"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-        />
+          <label>Event Name:</label>
+          <InputStyled
+            type="text"
+            placeholder="Add a name"
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+          />
         </CategoryContainer>
         <CategoryContainer>
-        <label>Event Description:</label>
-        <InputStyled
-          type="text"
-          placeholder="Add a description"
-          value={eventDescription}
-          onChange={(e) => setEventDescription(e.target.value)}
-        />
-</CategoryContainer>
-<CategoryContainer>
-        <label>Invite:</label>
-        <InputStyled
-          type="email"
-          placeholder="Add a email"
-          value={inviteEmail}
-          onChange={(e) => setInviteEmail(e.target.value)}
-        />
-        <BtnSmallBeije onClick={handleAddInvite}>Add Invite</BtnSmallBeije>
+          <label>Event Description:</label>
+          <InputStyled
+            type="text"
+            placeholder="Add a description"
+            value={eventDescription}
+            onChange={(e) => setEventDescription(e.target.value)}
+          />
+        </CategoryContainer>
+        <CategoryContainer>
+          <label>Invite:</label>
+          <InputStyled
+            type="email"
+            placeholder="Add a email"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+          />
+          <BtnSmallBeije onClick={handleAddInvite}>Add Invite</BtnSmallBeije>
         </CategoryContainer>
         <InvitedEmails>
           <label>People Invited:</label>
           {invitedUsers.map((user, index) => (
             <InvitedEmail key={index}>
               {user.email}
-              <DeleteInviteButton onClick={() => handleDeleteInvite(user.email)}>
+              <DeleteInviteButton
+                onClick={() => handleDeleteInvite(user.email)}
+              >
                 Delete
               </DeleteInviteButton>
             </InvitedEmail>
@@ -264,7 +293,9 @@ const NewEvent: React.FC = () => {
                     type="text"
                     placeholder="Add Option"
                     value={option}
-                    onChange={(e) => handleOptionChange(e, pollIndex, optionIndex)}
+                    onChange={(e) =>
+                      handleOptionChange(e, pollIndex, optionIndex)
+                    }
                   />
                   {poll.options.length < 3 && (
                     <BtnSmall onClick={() => handleAddOption(pollIndex)}>
@@ -272,13 +303,14 @@ const NewEvent: React.FC = () => {
                     </BtnSmall>
                   )}
                   {optionIndex > 0 && (
-                    <BtnSmall onClick={() => handleRemoveOption(pollIndex, optionIndex)}>
+                    <BtnSmall
+                      onClick={() => handleRemoveOption(pollIndex, optionIndex)}
+                    >
                       Remove Option
                     </BtnSmall>
                   )}
                 </div>
               ))}
-
 
               <BtnSmall onClick={() => handleAddToEvent(pollIndex)}>
                 Add to Event
@@ -289,25 +321,25 @@ const NewEvent: React.FC = () => {
               </BtnSmall>
             </PoolWindow>
           ))}
-          
+
           {polls.length < 3 && addedPolls.length < 3 && (
             <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
           )}
         </PollsContainer>
 
         {addedPolls.length > 0 && (
-  <CategoryContainer>
-    {addedPolls.map((addedPoll, index) => (
-      <AddedPollDisplay key={index}>
-        <p>{`Poll Name: ${addedPoll.name}`}</p>
-        <p>{`Options: ${addedPoll.options.join(', ')}`}</p>
-        <BtnSmall onClick={() => handleRemovePollDisplay(index)}>
-          Remove Poll
-        </BtnSmall>
-      </AddedPollDisplay>
-    ))}
-  </CategoryContainer>
-)}
+          <CategoryContainer>
+            {addedPolls.map((addedPoll, index) => (
+              <AddedPollDisplay key={index}>
+                <p>{`Poll Name: ${addedPoll.name}`}</p>
+                <p>{`Options: ${addedPoll.options.join(", ")}`}</p>
+                <BtnSmall onClick={() => handleRemovePollDisplay(index)}>
+                  Remove Poll
+                </BtnSmall>
+              </AddedPollDisplay>
+            ))}
+          </CategoryContainer>
+        )}
 
         <BtnMedium onClick={handleSubmitEvent}>Create Event</BtnMedium>
       </FormContainer>
@@ -315,21 +347,16 @@ const NewEvent: React.FC = () => {
   );
 };
 
-const PoolWindow = styled.div`
-
-
-`;
-
+const PoolWindow = styled.div``;
 
 const AddedPollDisplay = styled.div`
-display: flex;
-flex-direction: column;
-background-color: #f3d8b6;
-border-radius: 10px;
-padding: 10px;
-color:#f64a45;
+  display: flex;
+  flex-direction: column;
+  background-color: #f3d8b6;
+  border-radius: 10px;
+  padding: 10px;
+  color: #f64a45;
 `;
-
 
 const NewEventContainer = styled.div`
   width: 100%;
@@ -359,14 +386,12 @@ const FormContainer = styled.div`
   }
 
   @media screen and (max-width: 1280px) {
-    width:70%;
+    width: 70%;
   }
   @media screen and (max-width: 728px) {
-    width:90%;
+    width: 90%;
   }
-
 `;
-
 
 const InvitedEmail = styled.div`
   display: flex;
@@ -390,18 +415,15 @@ const DeleteInviteButton = styled.button`
   cursor: pointer;
 `;
 
-
 const InputStyled = styled.input`
-background-color: #f3d8b6;
-padding: 5px;
-color: grey;
-border-radius: 10px;
-border: 0px;
-min-height: 40px;
-width: 50%;
+  background-color: #f3d8b6;
+  padding: 5px;
+  color: grey;
+  border-radius: 10px;
+  border: 0px;
+  min-height: 40px;
+  width: 50%;
 `;
-
-
 
 const BtnSmall = styled.button`
   padding: 5px;
@@ -450,37 +472,36 @@ const BtnSmallBeije = styled.button`
   }
 `;
 
-  const CategoryContainer = styled.div`
-  gap:10px;
+const CategoryContainer = styled.div`
+  gap: 10px;
   padding: 10px;
-    width: 100%;
-    height: auto;
-    min-height: 15%;
-    background-color: #f57265;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-radius: 10px;
-    color: #f3d8b6;
-    @media screen and (max-width: 768px) {
+  width: 100%;
+  height: auto;
+  min-height: 15%;
+  background-color: #f57265;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 10px;
+  color: #f3d8b6;
+  @media screen and (max-width: 768px) {
     flex-direction: column;
-    }
-  `;
-  const InvitedEmails = styled.div`
+  }
+`;
+const InvitedEmails = styled.div`
   padding: 10px;
-    width: 100%;
-    height: auto;
-    min-height: 15%;
-    background-color: #f57265;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-radius: 10px;
-    color: #f3d8b6;
-    flex-direction: column;
-  `;
-  const PollsContainer = styled.div`
-  
+  width: 100%;
+  height: auto;
+  min-height: 15%;
+  background-color: #f57265;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 10px;
+  color: #f3d8b6;
+  flex-direction: column;
+`;
+const PollsContainer = styled.div`
   padding: 15px;
   width: 100%;
   min-height: 15%;
@@ -491,7 +512,7 @@ const BtnSmallBeije = styled.button`
   align-items: center;
   border-radius: 10px;
   margin-top: 20px;
-  color:#f3d8b6;
+  color: #f3d8b6;
 
   label {
     font-size: 20px;
@@ -556,6 +577,5 @@ const BtnSmallBeije = styled.button`
     }
   }
 `;
-
 
 export default NewEvent;

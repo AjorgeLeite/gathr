@@ -5,6 +5,54 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styled from "styled-components";
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+type Poll = {
+  id: number;
+  created_at: number;
+  name: string;
+  option_1: string;
+  option_2: string;
+  option_3: string;
+  vote_1: number;
+  vote_2: number;
+  vote_3: number;
+  already_voted: number[];
+  polls_id?: number[];
+};
+
+type Event = {
+  id: number;
+  created_at: number;
+  created_by: number;
+  name: string;
+  description: string;
+  going: User[];
+  invited: User[];
+  polls_id?: Poll[];
+  newPoll?: {
+    id: number;
+    created_at: number;
+    name: string;
+    option_1: string;
+    option_2: string;
+    option_3: string;
+    vote_1: number;
+    vote_2: number;
+    vote_3: number;
+    already_voted: number[];
+    polls_id?: number[];
+  };
+};
+
+type InvitedUser = {
+  invitedUserId: number;
+  email: string;
+};
 
 type EventItemProps = {
   title: string;
@@ -17,72 +65,32 @@ type EventItemProps = {
   onCancel: () => void;
 };
 
-type Event = {
-  id: number;
-  created_at: number;
-  created_by: number;
-  name: string;
-  description: string;
-  going: number[];
-  invited: number[];
-  polls_id?: Poll[];
-};
-
-type Poll = {
-  polls_id: number;
-  id: number;
-  created_at: number;
-  name: string;
-  option_1: string;
-  option_2: string;
-  option_3: string;
-  vote_1: number;
-  vote_2: number;
-  vote_3: number;
-  already_voted: number[];
-};
-
-type InvitedUser = {
-  invitedUserId: number;
-  email: string;
-};
-
 const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   const [updatedEvent, setUpdatedEvent] = useState<Event | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitedUsers, setInvitedUsers] = useState<InvitedUser[]>([]);
   const [emailNotRegistered, setEmailNotRegistered] = useState(false);
-
-  const handleAddPoll = () => {
-    setUpdatedEvent((prevEvent) => ({
-      ...(prevEvent as Event),
-      polls_id: [
-        ...(prevEvent?.polls_id || []),
-        {
-          polls_id: 0,
-          id: 0,
-          created_at: 0,
-          name: "",
-          option_1: "",
-          option_2: "",
-          option_3: "",
-          vote_1: 0,
-          vote_2: 0,
-          vote_3: 0,
-          already_voted: [],
-        },
-      ],
-    }));
-  };
+  const [newPollIds, setNewPollIds] = useState<number[]>([]);
 
   const handleDeletePoll = (pollIndex: number) => {
-    setUpdatedEvent((prevEvent) => {
-      const updatedPolls = [...(prevEvent?.polls_id || [])];
-      updatedPolls.splice(pollIndex, 1);
-      return {
-        ...(prevEvent as Event),
-        polls_id: updatedPolls,
-      };
+    if (!updatedEvent) return;
+
+    const updatedPolls = [...(updatedEvent.polls_id || [])];
+    const deletedPollId = updatedPolls[pollIndex]?.id;
+
+    setNewPollIds((prevIds) => prevIds.filter((id) => id !== deletedPollId));
+
+    updatedPolls.splice(pollIndex, 1);
+
+    const remainingPollIds: number[] = updatedPolls
+      .flatMap((poll) => poll.polls_id || [])
+      .filter((id) => id !== deletedPollId);
+
+    setNewPollIds(remainingPollIds);
+
+    setUpdatedEvent({
+      ...(updatedEvent as Event),
+      polls_id: updatedPolls,
     });
   };
 
@@ -96,32 +104,19 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     const fetchEvent = async () => {
       console.log("event fetching", event);
       try {
-        const response = await axios.get(
-          `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/events/${event.id}`
-        );
-        setUpdatedEvent(response.data);
-        console.log("emailsgetting", response.data);
-
-        const userEmailPromises = response.data.invited.map(
-          async (invitedUserId: any) => {
-            console.log("emailsid", invitedUserId);
-            const userEmailResponse = await axios.get(
-              `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user/${invitedUserId}`
-            );
-            return userEmailResponse.data.email;
-          }
-        );
-
-        const userEmails = await Promise.all(userEmailPromises);
-
-        const updatedInvitedUsers: InvitedUser[] = response.data.invited.map(
-          (invitedUserId: any, index: number) => ({
-            invitedUserId,
-            email: userEmails[index],
+        setUpdatedEvent(event);
+        console.log("polls_id:s", event);
+        const updatedInvitedUsers: InvitedUser[] = event.invited.map(
+          (user: User) => ({
+            invitedUserId: user.id,
+            email: user.email,
           })
         );
 
         setInvitedUsers(updatedInvitedUsers);
+        const pollIds = event.polls_id?.map((poll) => poll.id) || [];
+        console.log("useffectpollids", pollIds);
+        setNewPollIds(pollIds);
       } catch (error: any) {
         console.error("Error fetching event:", error.message);
       }
@@ -161,6 +156,88 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     }
   };
 
+  const handleAddPoll = async () => {
+    try {
+      const optionsResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
+        {
+          name: updatedEvent?.newPoll?.name || "",
+          option_1: updatedEvent?.newPoll?.option_1 || "",
+          option_2: updatedEvent?.newPoll?.option_2 || "",
+          option_3: updatedEvent?.newPoll?.option_3 || "",
+          vote_1: 0,
+          vote_2: 0,
+          vote_3: 0,
+          already_voted: [],
+          poll_id: 0,
+        }
+      );
+
+      const newOptionsId = optionsResponse.data.id;
+
+      const newPoll = {
+        id: 0,
+        created_at: 0,
+        name: updatedEvent?.newPoll?.name || "",
+        option_1: updatedEvent?.newPoll?.option_1 || "",
+        option_2: updatedEvent?.newPoll?.option_2 || "",
+        option_3: updatedEvent?.newPoll?.option_3 || "",
+        vote_1: 0,
+        vote_2: 0,
+        vote_3: 0,
+        already_voted: [],
+        polls_id: [],
+      };
+
+      setUpdatedEvent((prevEvent) => {
+        if (!prevEvent) return prevEvent;
+
+        const updatedPolls = [...(prevEvent.polls_id || [])];
+        updatedPolls.push(newPoll);
+
+        return {
+          ...(prevEvent as Event),
+          polls_id: updatedPolls,
+          newPoll: undefined,
+        };
+      });
+
+      const pollResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
+        {
+          name: updatedEvent?.newPoll?.name || "",
+          poll_options_id: newOptionsId,
+        }
+      );
+
+      const prevPolls_ids = (updatedEvent?.polls_id || [])
+        .flatMap((poll) => poll.polls_id || [])
+        .filter((id): id is number => id !== undefined);
+
+      const newPollId = pollResponse.data.id || 0;
+      prevPolls_ids.push(newPollId);
+      setNewPollIds(prevPolls_ids);
+
+      console.log("newpullids: " + newPollId);
+      await axios.patch(
+        `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
+        {
+          name: updatedEvent?.newPoll?.name || "",
+          option_1: updatedEvent?.newPoll?.option_1 || "",
+          option_2: updatedEvent?.newPoll?.option_2 || "",
+          option_3: updatedEvent?.newPoll?.option_3 || "",
+          vote_1: 0,
+          vote_2: 0,
+          vote_3: 0,
+          already_voted: [],
+          polls_id: newPollId,
+        }
+      );
+    } catch (error) {
+      console.error("Error creating poll:", error);
+    }
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -169,27 +246,18 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     const { name, value } = e.target;
 
     if (name.startsWith("polls_id.")) {
-      const pollIndex = parseInt(name.split(".")[1], 10);
-
+    } else if (name.startsWith("newPoll.")) {
       setUpdatedEvent((prevEvent) => {
         if (!prevEvent) return prevEvent;
-        const updatedPolls = [...(prevEvent.polls_id || [])];
-        updatedPolls[pollIndex] = {
-          ...(updatedPolls[pollIndex] || {}),
-          [name.split(".")[2]]: value,
+
+        const updatedNewPoll = {
+          ...(prevEvent.newPoll || {}),
+          [name.split(".")[1]]: value,
         };
 
         return {
           ...prevEvent,
-          polls_id: updatedPolls,
-        };
-      });
-    } else {
-      setUpdatedEvent((prevEvent) => {
-        if (!prevEvent) return prevEvent;
-        return {
-          ...(prevEvent as Event),
-          [name]: value,
+          newPoll: updatedNewPoll as Poll,
         };
       });
     }
@@ -197,15 +265,29 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
   const handleSaveEvent = async (updatedEvent: Event | null) => {
     if (!updatedEvent) return;
+
     const { authToken } = parseCookies();
-    console.log("editupdated", updatedEvent);
 
     try {
+      const { polls_id, ...eventData } = updatedEvent;
+
+      const invitedUserIds = invitedUsers.map((user) => user.invitedUserId);
+
+      console.log("asdasdsss", newPollIds);
+      const updatedEventData = {
+        name: updatedEvent?.name || "",
+        description: updatedEvent?.description || "",
+        invited: updatedEvent?.invited || [],
+        polls_id: newPollIds,
+        created_by: updatedEvent?.created_by,
+        going: updatedEvent?.going || [],
+      };
+      console.log("ssss", updatedEventData);
       await axios.patch(
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/events/${event.id}`,
         {
-          ...updatedEvent,
-          invited: invitedUsers.map((user) => user.invitedUserId),
+          ...updatedEventData,
+          invited: invitedUserIds,
         },
         {
           headers: {
@@ -215,6 +297,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
       );
 
       onSave(updatedEvent);
+      router.reload();
     } catch (error: any) {
       console.error("Error updating event:", error.message);
     }
@@ -254,9 +337,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
               {invitedUsers.map((user, index) => (
                 <EmailsDisplay key={index}>
                   {user.email}{" "}
-                  <BtnSmallBeije
-                    onClick={() => handleRemoveInvite(index)}
-                  >
+                  <BtnSmallBeije onClick={() => handleRemoveInvite(index)}>
                     Remove
                   </BtnSmallBeije>
                 </EmailsDisplay>
@@ -277,7 +358,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           {emailNotRegistered && (
             <TextWarning>Email is not registered</TextWarning>
           )}
-          
+
           <PollDisplayContainer>
             {updatedEvent.polls_id &&
               updatedEvent.polls_id.map((poll, pollIndex) => (
@@ -286,26 +367,25 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                   <p>{`Option 1: ${poll.option_1}`}</p>
                   <p>{`Votes: ${poll.vote_1}`}</p>
                   <p>{`Option 2: ${poll.option_2}`}</p>
-                  <p>{`Votes:${poll.vote_2}`}</p>
+                  <p>{`Votes: ${poll.vote_2}`}</p>
                   <p>{`Option 3: ${poll.option_3}`}</p>
                   <p>{`Votes: ${poll.vote_3}`}</p>
-                  <br/>
+                  <br />
                   <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
                     Delete Poll
                   </BtnSmallBeije>
                 </PollDisplay>
               ))}
-            
           </PollDisplayContainer>
-<PollDisplayContainer>
-<div>
-              
+          <PollDisplayContainer>
+            <div>
               <InputContainer>
                 <label>Poll Name:</label>
                 <InputStyled
                   type="text"
                   name="newPoll.name"
                   onChange={handleInputChange}
+                  value={updatedEvent?.newPoll?.name || ""}
                 />
               </InputContainer>
               <InputContainer>
@@ -314,6 +394,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                   type="text"
                   name="newPoll.option_1"
                   onChange={handleInputChange}
+                  value={updatedEvent?.newPoll?.option_1 || ""}
                 />
               </InputContainer>
               <InputContainer>
@@ -322,6 +403,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                   type="text"
                   name="newPoll.option_2"
                   onChange={handleInputChange}
+                  value={updatedEvent?.newPoll?.option_2 || ""}
                 />
               </InputContainer>
               <InputContainer>
@@ -330,11 +412,13 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                   type="text"
                   name="newPoll.option_3"
                   onChange={handleInputChange}
+                  value={updatedEvent?.newPoll?.option_3 || ""}
                 />
               </InputContainer>
+
               <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
             </div>
-</PollDisplayContainer>
+          </PollDisplayContainer>
           <InputContainer>
             <BtnMedium onClick={() => handleSaveEvent(updatedEvent)}>
               Edit Event
@@ -358,9 +442,8 @@ const PollDisplay = styled.div`
   border: 1px solid #f3d8b6;
   border-radius: 20px;
   padding: 20px;
-  
+
   @media screen and (max-width: 1280px) {
-    
   }
 
   @media screen and (max-width: 728px) {
@@ -378,7 +461,7 @@ const PollDisplayContainer = styled.div`
   padding: 10px;
   margin-top: 10px;
   color: #f3d8b6;
-text-align: center;
+  text-align: center;
   @media screen and (max-width: 1280px) {
     width: 60%;
     flex-direction: column;
@@ -388,7 +471,6 @@ text-align: center;
     width: 80%;
   }
 `;
-
 
 const InputStyled = styled.input`
   background-color: #f3d8b6;
@@ -408,7 +490,7 @@ const EventEditContainers = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-min-height: 60vh;
+  min-height: 60vh;
   align-items: center;
   gap: 10px;
 `;
@@ -482,10 +564,10 @@ const CategoryContainer = styled.div`
   color: #f3d8b6;
 
   @media screen and (max-width: 1280px) {
-    width:60%;
+    width: 60%;
   }
   @media screen and (max-width: 728px) {
-    width:80%;
+    width: 80%;
   }
 `;
 
@@ -500,14 +582,14 @@ const EmailsContainer = styled.div`
   align-items: center;
   border-radius: 10px;
   padding: 10px;
-  gap:10px;
-  color:#f3d8b6;
+  gap: 10px;
+  color: #f3d8b6;
 
   @media screen and (max-width: 1280px) {
-    width:60%;
+    width: 60%;
   }
   @media screen and (max-width: 728px) {
-    width:80%;
+    width: 80%;
   }
 `;
 
@@ -519,7 +601,6 @@ const EmailsDisplay = styled.div`
   flex-direction: row;
   padding-left: 5%;
   padding-right: 5%;
-  
 `;
 
 export default EditEvent;

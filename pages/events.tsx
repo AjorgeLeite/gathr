@@ -8,22 +8,16 @@ import EventItem from "@/components/EventItem";
 import LoginRegisterComp from "@/components/LoginRegisterComp";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import EditEvent from "@/components/EditModal"; 
+import EditEvent from "@/components/EditModal";
 import Image from "next/image";
 
-type Event = {
+type User = {
   id: number;
-  created_at: number;
-  created_by: number;
   name: string;
-  description: string;
-  going: number[];
-  invited: number[];
-  polls_id?: Poll[];
+  email: string;
 };
 
 type Poll = {
-  polls_id: number;
   id: number;
   created_at: number;
   name: string;
@@ -34,6 +28,31 @@ type Poll = {
   vote_2: number;
   vote_3: number;
   already_voted: number[];
+  polls_id?: number[];
+};
+
+type Event = {
+  id: number;
+  created_at: number;
+  created_by: number;
+  name: string;
+  description: string;
+  going: User[];
+  invited: User[];
+  polls_id?: Poll[];
+  newPoll?: {
+    id: number;
+    created_at: number;
+    name: string;
+    option_1: string;
+    option_2: string;
+    option_3: string;
+    vote_1: number;
+    vote_2: number;
+    vote_3: number;
+    already_voted: number[];
+    polls_id?: number[];
+  };
 };
 
 type EventsPageProps = {
@@ -85,14 +104,16 @@ const handleDeleteEvent = async (eventId: number, router: any) => {
     );
 
     const updatedEvents = response.data;
-    router.push('/events');
+    router.push("/events");
   } catch (error: any) {
     console.error("Error deleting event:", error.message);
   }
 };
 
 const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
-  const [openIndexes, setOpenIndexes] = useState<[number | null, number | null, number | null]>([null, null, null]); 
+  const [openIndexes, setOpenIndexes] = useState<
+    [number | null, number | null, number | null]
+  >([null, null, null]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const userData = useSelector((userData: any) => userData.user.user);
@@ -100,18 +121,22 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
   const myCreatedEvents = events.filter(
     (event) => event.created_by === userData.userId
   );
+
   const invitedEvents = events.filter((event) =>
-    event.invited.includes(userData.userId)
+    event.invited.some((invitedUser) => invitedUser.id === userData.userId)
   );
+
   const goingEvents = events.filter((event) =>
-    event.going.includes(userData.userId)
+    event.going.some((goingUser) => goingUser.id === userData.userId)
   );
 
   const handleOpenIndexChange = (
     categoryIndex: number,
     index: number | null
   ) => {
-    const newOpenIndexes: [number | null, number | null, number | null] = [...openIndexes];
+    const newOpenIndexes: [number | null, number | null, number | null] = [
+      ...openIndexes,
+    ];
     newOpenIndexes[categoryIndex] = index;
     setOpenIndexes(newOpenIndexes);
   };
@@ -120,7 +145,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
     setIsEditing(true);
     setCurrentEvent(event);
   };
-  
+
   const handleCancelEdit = () => {
     setIsEditing(false);
     setCurrentEvent(null);
@@ -132,45 +157,48 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
     <>
       {userData.isLoggedIn === false ? (
         <PageContainer>
-        <TopBar>
-          <Image
-            src="/assets/LOGOPNGBEIJE.png"
-            alt="gathr logo"
-            width={80}
-            height={35}
-          ></Image>
-        </TopBar>
-        <StyledImage 
-        src="/assets/2.jpg"
+          <TopBar>
+            <Image
+              src="/assets/LOGOPNGBEIJE.png"
+              alt="gathr logo"
+              width={80}
+              height={35}
+            ></Image>
+          </TopBar>
+          <StyledImage
+            src="/assets/2.jpg"
             alt="celebration"
             width={1000}
             height={600}
-            >
-        </StyledImage>
-            <LoginRegisterContainer>
-              <LoginText>Log in, Sign up, and start inviting your friends!</LoginText>
-    <LoginRegisterComp />
-    </LoginRegisterContainer>
-    </PageContainer>
+          ></StyledImage>
+          <LoginRegisterContainer>
+            <LoginText>
+              Log in, Sign up, and start inviting your friends!
+            </LoginText>
+            <LoginRegisterComp />
+          </LoginRegisterContainer>
+        </PageContainer>
       ) : (
         <EventsPageContainer>
-          
           <RedTitle>Events</RedTitle>
-<Link href={"/newevents"}>
+          <Link href={"/newevents"}>
             <CreateEventBtn>Create a New Event</CreateEventBtn>
           </Link>
           {isEditing && currentEvent ? (
             <EditEvent
-                event={currentEvent}
-                onCancel={handleCancelEdit}
-                onSave={() => { } } 
-                title={""} openIndex={null} onDeleteEvent={function (eventId: number): void {
-                  throw new Error("Function not implemented.");
-                } } onEditEvent={function (event: { id: number; created_at: number; created_by: number; name: string; description: string; going: number[]; invited: number[]; polls_id?: { polls_id: number; id: number; created_at: number; name: string; option_1: string; option_2: string; option_3: string; vote_1: number; vote_2: number; vote_3: number; already_voted: number[]; }[] | undefined; }): void {
-                  throw new Error("Function not implemented.");
-                } } setOpenIndex={function (index: number | null): void {
-                  throw new Error("Function not implemented.");
-                } }            />
+              event={currentEvent}
+              onCancel={handleCancelEdit}
+              onSave={() => {}}
+              title={""}
+              openIndex={null}
+              onDeleteEvent={function (eventId: number): void {
+                throw new Error("Function not implemented.");
+              }}
+              onEditEvent={(event: Event) => handleEditEvent({ ...event })}
+              setOpenIndex={function (index: number | null): void {
+                throw new Error("Function not implemented.");
+              }}
+            />
           ) : (
             <>
               <EventItem
@@ -219,7 +247,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
   );
 };
 
-const RedTitle = styled.h1` 
+const RedTitle = styled.h1`
   color: #f64a45;
   font-size: 36px;
 `;
@@ -241,26 +269,22 @@ const CreateEventBtn = styled.button`
 
   @media screen and (max-width: 1280px) {
     width: 300px;
-
   }
-
 `;
 
 const PleaseLogIn = styled.div`
   display: flex;
   width: 100%;
-max-height: 80vh;
+  max-height: 80vh;
   padding: 20%;
   justify-content: space-around;
   align-items: center;
   background-color: #f3d8b6;
-text-align: center;
-gap: 15px;
+  text-align: center;
+  gap: 15px;
   @media screen and (max-width: 1280px) {
     flex-direction: column;
-
   }
-
 `;
 
 const EventsPageContainer = styled.div`
@@ -275,20 +299,19 @@ const EventsPageContainer = styled.div`
   background-color: #f3d8b6;
 `;
 const LoginText = styled.h2`
- margin-right: 30px;
- font-size: 55px;
- text-align: center;
- color:white;
+  margin-right: 30px;
+  font-size: 55px;
+  text-align: center;
+  color: white;
 
- @media screen and (max-width: 1280px) {
+  @media screen and (max-width: 1280px) {
     margin-right: 0px;
- font-size: 45px;
+    font-size: 45px;
     flex-direction: column;
     width: 80%;
     margin-top: 27%;
     margin-bottom: -5%;
   }
-
 `;
 
 const TopBar = styled.div`
@@ -311,39 +334,38 @@ const StyledImage = styled(Image)`
 `;
 
 const PageContainer = styled.div`
-margin-top: -9%;
-background-color: #f3d8b6;
-width: 100%;
-height: auto;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 10px;
-color: #f3d8b6;
-overflow: hidden;
+  margin-top: -9%;
+  background-color: #f3d8b6;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #f3d8b6;
+  overflow: hidden;
 `;
 
 const LoginRegisterContainer = styled.div`
-margin-top: 12%;
-display: flex;
-justify-content: space-around;
-align-items: center;
-width: 50%;
-position: absolute;
-z-index:99;
-gap: 10px;
-h1 {
-  color:white;
-  font-size: 50px;
-  text-align: center;
-}
+  margin-top: 12%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 50%;
+  position: absolute;
+  z-index: 99;
+  gap: 10px;
+  h1 {
+    color: white;
+    font-size: 50px;
+    text-align: center;
+  }
 
-@media screen and (max-width: 1280px) {
+  @media screen and (max-width: 1280px) {
     flex-direction: column;
     width: 80%;
   }
-
 `;
 
-export default EventsPage
+export default EventsPage;
