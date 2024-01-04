@@ -617,6 +617,7 @@ const EmailsDisplay = styled.div`
   flex-direction: row;
   padding-left: 5%;
   padding-right: 5%;
+  flex-wrap: wrap;
 `;
 
 export default EditEvent;
