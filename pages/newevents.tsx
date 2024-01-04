@@ -4,6 +4,7 @@ import styled, { css } from "styled-components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import React from "react";
 
 type InvitedUser = {
   email: string;
@@ -25,8 +26,10 @@ const NewEvent: React.FC = () => {
   const [polls, setPolls] = useState<PollOption[]>([]);
   const [addedPolls, setAddedPolls] = useState<PollOption[]>([]);
   const [pollOptionIds, setPollOptionIds] = useState<number[]>([]);
+  const [emailNotRegistered, setEmailNotRegistered] = useState(false);
 
-  const userId = useSelector((state: any) => state.user.user.userId);
+  const userId = useSelector((state: any) => state.user?.user?.userId);
+
   const { authToken } = parseCookies();
   const router = useRouter();
 
@@ -40,14 +43,19 @@ const NewEvent: React.FC = () => {
           `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/user?email=${inviteEmail}`
         );
 
-        const invitedUserId = response.data[0].id;
-        setInvitedUsers([
-          ...invitedUsers,
-          { email: inviteEmail, invitedUserId },
-        ]);
-        setInviteEmail("");
+        if (response.data.length > 0) {
+          const invitedUserId = response.data[0].id;
+          setInvitedUsers([
+            ...invitedUsers,
+            { email: inviteEmail, invitedUserId },
+          ]);
+          setInviteEmail("");
+          setEmailNotRegistered(false);
+        } else {
+          setEmailNotRegistered(true);
+        }
       } catch (error) {
-        console.error("Error fetching user id:", error);
+        console.error("Error getting user id:", error);
       }
     }
   };
@@ -137,33 +145,6 @@ const NewEvent: React.FC = () => {
     }
   };
 
-  const handleRemovePoll = async (pollIndex: number) => {
-    try {
-      const removedPoll = polls[pollIndex];
-      const pollOptionIdToRemove = removedPoll.pollOptionId;
-
-      await axios.delete(
-        `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${pollOptionIdToRemove}`
-      );
-
-      const updatedPolls = [...polls];
-      updatedPolls.splice(pollIndex, 1);
-      setPolls(updatedPolls);
-
-      const updatedAddedPolls = addedPolls.filter(
-        (_, index) => index !== pollIndex
-      );
-      setAddedPolls(updatedAddedPolls);
-
-      const updatedPollOptionIds = pollOptionIds.filter(
-        (id) => id !== pollOptionIdToRemove
-      );
-      setPollOptionIds(updatedPollOptionIds);
-    } catch (error) {
-      console.error("Error removing poll:", error);
-    }
-  };
-
   const handleRemovePollDisplay = (pollIndex: number) => {
     const updatedAddedPolls = addedPolls.filter(
       (_, index) => index !== pollIndex
@@ -233,8 +214,9 @@ const NewEvent: React.FC = () => {
       <RedTextBig>Create a New Event</RedTextBig>
       <FormContainer>
         <CategoryContainer>
-          <label>Event Name:</label>
+          <label htmlFor="eventName">Event Name:</label>
           <InputStyled
+            id="eventName"
             type="text"
             placeholder="Add a name"
             value={eventName}
@@ -242,8 +224,9 @@ const NewEvent: React.FC = () => {
           />
         </CategoryContainer>
         <CategoryContainer>
-          <label>Event Description:</label>
+          <label htmlFor="eventDesc">Event Description:</label>
           <InputStyled
+            id="eventDesc"
             type="text"
             placeholder="Add a description"
             value={eventDescription}
@@ -251,8 +234,9 @@ const NewEvent: React.FC = () => {
           />
         </CategoryContainer>
         <CategoryContainer>
-          <label>Invite:</label>
+          <label htmlFor="eventInv">Invite:</label>
           <InputStyled
+            id="eventInv"
             type="email"
             placeholder="Add a email"
             value={inviteEmail}
@@ -260,8 +244,11 @@ const NewEvent: React.FC = () => {
           />
           <BtnSmallBeije onClick={handleAddInvite}>Add Invite</BtnSmallBeije>
         </CategoryContainer>
+        {emailNotRegistered && (
+          <TextWarning>Email is not registered</TextWarning>
+        )}
         <InvitedEmails>
-          <label>People Invited:</label>
+          <label htmlFor="eventPplInv">People Invited:</label>
           {invitedUsers.map((user, index) => (
             <InvitedEmail key={index}>
               {user.email}
@@ -278,18 +265,20 @@ const NewEvent: React.FC = () => {
           <h2>Polls:</h2>
           {polls.map((poll, pollIndex) => (
             <PoolWindow key={pollIndex}>
-              <label>Poll Name:</label>
+              <label htmlFor="pollName">Poll Name:</label>
               <input
+                id="pollName"
                 type="text"
                 placeholder="Poll Name"
                 value={poll.name}
                 onChange={(e) => handlePollNameChange(e, pollIndex)}
               />
 
-              <label>Options:</label>
+              <label htmlFor="pollOptions">Options:</label>
               {poll.options.map((option, optionIndex) => (
                 <div key={optionIndex}>
                   <input
+                    id="pollOptions"
                     type="text"
                     placeholder="Add Option"
                     value={option}
@@ -347,7 +336,7 @@ const NewEvent: React.FC = () => {
   );
 };
 
-const PoolWindow = styled.div``;
+
 
 const AddedPollDisplay = styled.div`
   display: flex;
@@ -393,6 +382,13 @@ const FormContainer = styled.div`
   }
 `;
 
+const TextWarning = styled.h3`
+  color: #f64a45;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+`;
+
 const InvitedEmail = styled.div`
   display: flex;
   align-items: center;
@@ -402,7 +398,7 @@ const InvitedEmail = styled.div`
   margin-top: 5px;
   gap: 10%;
 `;
-const RedTextBig = styled.text`
+const RedTextBig = styled.p`
   color: #f64a45;
   font-size: 22px;
   margin-bottom: 5px;
@@ -414,6 +410,7 @@ const DeleteInviteButton = styled.button`
   padding: 5px;
   cursor: pointer;
 `;
+const PoolWindow = styled.div``;
 
 const InputStyled = styled.input`
   background-color: #f3d8b6;

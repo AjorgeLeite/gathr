@@ -2,12 +2,11 @@ import { useState, FormEvent } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import Image from "next/image";
-import { useDispatch, useSelector } from 'react-redux';
-import { loginSuccess, loginFailure } from '../store/action-creators/actions';
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, loginFailure } from "../store/action-creators/actions";
 import { useRouter } from "next/router";
-import { setCookie, parseCookies } from 'nookies';
-
-
+import { setCookie, parseCookies } from "nookies";
+import React from "react";
 
 interface LoginFormProps {}
 
@@ -17,7 +16,6 @@ interface RootState {
     name: string;
     userId: number | null;
   };
-
 }
 
 const LoginForm: React.FC<LoginFormProps> = () => {
@@ -25,10 +23,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const user = useSelector((state: RootState) => state.user);
   const router = useRouter();
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -37,13 +35,13 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       e.preventDefault();
 
       const response = await axios.post(
-        'https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/login',
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/login",
         { email, password }
       );
 
-      setCookie(null, 'authToken', response.data.authToken, {
-        maxAge: 30 * 24 * 60 * 60, 
-        path: '/',
+      setCookie(null, "authToken", response.data.authToken, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: "/",
       });
 
       const userInfo = await axios.get(
@@ -53,11 +51,11 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
       dispatch(loginSuccess(userInfo.data.name, userInfo.data.id));
 
-     console.log(
+      console.log(
         "userid: " + userInfo.data.id,
-        "usernames: " + userInfo.data.name,
+        "usernames: " + userInfo.data.name
       );
-      router.push('/events');
+      router.push("/events");
     } catch (error: any) {
       dispatch(loginFailure(error.response.data.message));
       setError(true);
@@ -72,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         <TextColor>Please Login Here: </TextColor>
         <FormStyle onSubmit={onLoginSubmit}>
           <TextInputs
-          className="txtinput"
+            className="txtinput"
             type="email"
             required
             placeholder="Email"
@@ -80,7 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextInputs
-          className="txtinput"
+            className="txtinput"
             type="password"
             required
             placeholder="Password"
@@ -91,7 +89,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           {error && <p>{errorMessage}</p>}
           {!error && submitted && <p>Logged In</p>}
 
-          {isLoading && <Image src="/assets/loading1s.gif" width={50} height={50} alt="Loading" />}
+          {isLoading && (
+            <Image
+              src="/assets/loading1s.gif"
+              width={50}
+              height={50}
+              alt="Loading"
+            />
+          )}
         </FormStyle>
       </FormContainer>
     </>
@@ -99,7 +104,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 };
 
 const TextColor = styled.h2`
-color: #f3d8b6;
+  color: #f3d8b6;
 `;
 
 const FormContainer = styled.div`

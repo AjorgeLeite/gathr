@@ -1,20 +1,30 @@
 import { LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from '../action-creators/actions';
 
-const initialState = {
+interface UserState {
+  isLoggedIn: boolean;
+  name: string;
+  userId: number | null;
+}
+
+interface RootState {
+  user: UserState;
+  error: string;
+}
+
+const initialState: RootState = {
   user: {
     isLoggedIn: false,
     name: '',
-    userId: null, 
+    userId: null,
   },
   error: '',
 };
 
-const userReducer = (state = initialState, action: { type: any; payload: { name: string; errorMessage: any; events: any; userId: number }; }) => {
+const userReducer = (state = initialState, action: any): RootState => {
   switch (action.type) {
     case LOGIN_SUCCESS:
       console.log("reducer login success name: " + action.payload.name)
       return {
-        
         ...state,
         user: {
           ...state.user,
@@ -34,7 +44,7 @@ const userReducer = (state = initialState, action: { type: any; payload: { name:
         },
         error: action.payload.errorMessage,
       };
-      case LOGOUT:
+    case LOGOUT:
       return {
         ...state,
         user: {

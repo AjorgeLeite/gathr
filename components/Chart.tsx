@@ -1,6 +1,6 @@
-import React from 'react';
-import { Doughnut } from 'react-chartjs-2';
-import 'chart.js/auto';
+import React from "react";
+import { Doughnut } from "react-chartjs-2";
+import "chart.js/auto";
 
 type PollDoughnutChartProps = {
   pollData: {
@@ -15,13 +15,19 @@ type PollDoughnutChartProps = {
 };
 
 const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
+  const noEmptyLabels = [
+    pollData.option_1,
+    pollData.option_2,
+    pollData.option_3,
+  ].filter((label) => label.trim() !== "");
+
   const chartData = {
-    labels: [pollData.option_1, pollData.option_2, pollData.option_3],
+    labels: noEmptyLabels,
     datasets: [
       {
         data: [pollData.vote_1, pollData.vote_2, pollData.vote_3],
-        backgroundColor: ['#f57265', '#f3d8b6', '#f48675'],
-        hoverBackgroundColor: ['#f57265', '#f3d8b6', '#f48675'],
+        backgroundColor: ["#f57265", "#f3d8b6", "#f48675"],
+        hoverBackgroundColor: ["#f57265", "#f3d8b6", "#f48675"],
       },
     ],
   };
@@ -36,7 +42,13 @@ const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
     },
   };
 
-  return <Doughnut data={chartData} options={chartOptions} />;
+  return (
+    <>
+      {noEmptyLabels.length > 0 && (
+        <Doughnut data={chartData} options={chartOptions} />
+      )}
+    </>
+  );
 };
 
 export default PollDoughnutChart;

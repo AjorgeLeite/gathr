@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import axios from "axios";
 import styled from "styled-components";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import EventItem from "@/components/EventItem";
 import LoginRegisterComp from "@/components/LoginRegisterComp";

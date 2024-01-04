@@ -8,10 +8,9 @@ import { loginSuccess } from "@/store/action-creators/actions";
 import { useEffect } from "react";
 import { parseCookies } from "nookies";
 import axios from "axios";
-
+import React from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
-
   useEffect(() => {
     async function checkAuthToken() {
       const { authToken } = parseCookies();
@@ -19,20 +18,19 @@ export default function App({ Component, pageProps }: AppProps) {
       if (authToken) {
         try {
           const userInfo = await axios.get(
-            'https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/me',
-            { headers: { Authorization: 'Bearer ' + authToken } }
+            "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/me",
+            { headers: { Authorization: "Bearer " + authToken } }
           );
 
           store.dispatch(loginSuccess(userInfo.data.name, userInfo.data.id));
         } catch (error) {
-          console.error('Error fetching user information:', error);
+          console.error("Error fetching user information:", error);
         }
       }
     }
 
     checkAuthToken();
   }, []);
-
 
   return (
     <>

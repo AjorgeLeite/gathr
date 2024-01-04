@@ -1,6 +1,7 @@
 import Image from "next/image";
 import styled, { keyframes } from "styled-components";
 import LoginRegisterComp from "@/components/LoginRegisterComp";
+import React from "react";
 
 export default function Home() {
   return (
@@ -16,9 +17,9 @@ export default function Home() {
           <HomepageBannerText>
             <h1>Welcome to gathr.</h1>
             <p>
-              Plan and decide together! <br/> gathr lets you effortlessly create
-              events with friends. <br/>Vote on activities and make every moment
-              unforgettable. Start now!
+              Plan and decide together! <br /> gathr lets you effortlessly
+              create events with friends. <br />
+              Vote on activities and make every moment unforgettable. Start now!
             </p>
           </HomepageBannerText>
         </HomepageBanner>
@@ -38,10 +39,10 @@ export default function Home() {
             height={600}
           ></StyledImage>
           <HomepageInfoContent>
-          <HomepageInfoText>
-            <h1>Log in, Sign up, and start inviting your friends!</h1>
-          </HomepageInfoText>
-          <LoginRegisterComp></LoginRegisterComp>
+            <HomepageInfoText>
+              <h1>Log in, Sign up, and start inviting your friends!</h1>
+            </HomepageInfoText>
+            <LoginRegisterComp></LoginRegisterComp>
           </HomepageInfoContent>
         </HomepageInfo>
       </HomepageContainer>
@@ -102,9 +103,8 @@ const HomepageContainer = styled.div`
   margin-bottom: 2%;
 
   @media screen and (max-width: 768px) {
-
     margin-bottom: 5%;
-}
+  }
 `;
 
 const HomepageBanner = styled.div`
@@ -112,11 +112,11 @@ const HomepageBanner = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-min-height: 800px;
+  min-height: 800px;
 `;
 const HomepageBannerText = styled.div`
-animation: ${slideInLeftToRight} 1s ease-in-out;
-margin-top: 10%;
+  animation: ${slideInLeftToRight} 1s ease-in-out;
+  margin-top: 10%;
   font-size: 35px;
   min-width: 35%;
   max-width: 60%;
@@ -124,10 +124,8 @@ margin-top: 10%;
   z-index: 99;
   text-align: center;
   padding: 20px;
-  
 
   @media screen and (max-width: 768px) {
-
     font-size: 28px;
     margin-top: 10%;
     max-width: 90%;
@@ -137,7 +135,6 @@ margin-top: 10%;
   @media screen and (min-width: 1280px) {
     margin-right: 40%;
     width: 50%;
-    
   }
   @media screen and (min-width: 1750px) {
     background-color: #f3ec78;
@@ -145,10 +142,9 @@ margin-top: 10%;
     background-size: 100%;
     -webkit-background-clip: text;
     -moz-background-clip: text;
-    -webkit-text-fill-color: transparent; 
+    -webkit-text-fill-color: transparent;
     -moz-text-fill-color: transparent;
   }
-
 `;
 const HomepageInfo = styled.div`
   width: 100%;
@@ -167,7 +163,6 @@ const HomepageInfoContent = styled.div`
   @media screen and (max-width: 768px) {
     flex-direction: column;
   }
-
 `;
 const HomepageInfoText = styled.div`
   font-size: 40px;
@@ -181,7 +176,6 @@ const HomepageInfoText = styled.div`
   align-items: center;
   /* background-color: #f3d8b682;
   border-radius: 20px; */
-  
 
   @media screen and (max-width: 1280px) {
     font-size: 18px;
@@ -189,11 +183,10 @@ const HomepageInfoText = styled.div`
   @media screen and (max-width: 768px) {
     font-size: 18px;
   }
-
 `;
 const StyledLogo = styled(Image)`
-animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
-margin-top: -5px;
+  animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
+  margin-top: -5px;
   position: absolute;
   top: 0;
   right: 0;
@@ -209,7 +202,7 @@ const StyledImage = styled(Image)`
   object-fit: cover;
 `;
 const StyledImageAnimated = styled(Image)`
-    animation: fadeInUp 0.5s ease-in-out;
+  animation: fadeInUp 0.5s ease-in-out;
   @keyframes fadeInUp {
     from {
       transform: translateY(20px);

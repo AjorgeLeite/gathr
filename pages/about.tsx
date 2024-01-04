@@ -1,12 +1,11 @@
 import styled, { keyframes } from "styled-components";
 import Image from "next/image";
+import React from "react";
 
 const About = () => {
   return (
     <>
       <AboutContainer>
-        
-
         <AboutText>
           <h1>Welcome to gathr!</h1>
           <br />
@@ -21,36 +20,28 @@ const About = () => {
           <h4>What can you do with gathr? </h4>
           <br />
           <br />
-
-          
-              Create Events: Easily create events for any occasion – from casual
-              get-togethers to exciting vacations. Describe your event, set the
-              date, and let the planning begin!
-            
-            <br /><br />
-          
-              Invite Friends: Invite your friends to join the fun! Our
-              user-friendly interface makes it simple to send out invitations,
-              and your friends will receive notifications to ensure they
-              don&apos;t miss out.
-            
-            <br /><br />
-          
-              RSVP and Voting: Friends can quickly respond to your event
-              invitation, letting you know if they can make it. But the
-              excitement doesn&apos;t end there – our unique voting feature
-              allows participants to collectively decide on key aspects of the
-              event, such as choosing the perfect restaurant or deciding the
-              destination for your next adventure.
-            
-            <br /><br />
-          
-              Shape Your Experience: Your event, your way. Our platform is
-              designed to put the decision-making power in the hands of the
-              participants. Vote on activities, suggest ideas, and collaborate
-              with your friends to create memorable experiences.
-            
-
+          Create Events: Easily create events for any occasion – from casual
+          get-togethers to exciting vacations. Describe your event, set the
+          date, and let the planning begin!
+          <br />
+          <br />
+          Invite Friends: Invite your friends to join the fun! Our user-friendly
+          interface makes it simple to send out invitations, and your friends
+          will receive notifications to ensure they don&apos;t miss out.
+          <br />
+          <br />
+          RSVP and Voting: Friends can quickly respond to your event invitation,
+          letting you know if they can make it. But the excitement doesn&apos;t
+          end there – our unique voting feature allows participants to
+          collectively decide on key aspects of the event, such as choosing the
+          perfect restaurant or deciding the destination for your next
+          adventure.
+          <br />
+          <br />
+          Shape Your Experience: Your event, your way. Our platform is designed
+          to put the decision-making power in the hands of the participants.
+          Vote on activities, suggest ideas, and collaborate with your friends
+          to create memorable experiences.
         </AboutText>
         <StyledImage
           src={"/assets/aboutbg.jpg"}
@@ -88,7 +79,7 @@ const StyledImage = styled(Image)`
 `;
 
 const AboutText = styled.div`
-animation: ${slideInLeftToRight} 1s ease-in-out;
+  animation: ${slideInLeftToRight} 1s ease-in-out;
   padding-top: 5%;
   padding-bottom: 5%;
   text-align: center;

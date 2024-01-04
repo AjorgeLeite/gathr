@@ -1,6 +1,7 @@
 import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 const Footer = () => {
   return (
@@ -23,15 +24,24 @@ const Footer = () => {
           </Link>
         </FooterLinks>
         <FooterInfo>
-          <Link href={"#"}><p>Copyright © 2021 Gathr</p></Link>
-          <Link href={"#"}><p>All Rights Reserved</p></Link>
-          <Link href={"#"}><p>Terms of Service</p></Link>
-          <Link href={"#"}><p>Privacy Policy</p></Link>
+          <Link href={"#"}>
+            <p>Copyright © 2021 Gathr</p>
+          </Link>
+          <Link href={"#"}>
+            <p>All Rights Reserved</p>
+          </Link>
+          <Link href={"#"}>
+            <p>Terms of Service</p>
+          </Link>
+          <Link href={"#"}>
+            <p>Privacy Policy</p>
+          </Link>
         </FooterInfo>
       </FooterStyle>
     </>
   );
 };
+
 const swing = keyframes`
   0% {
     transform: rotate(0deg);
@@ -53,7 +63,6 @@ const swingWithDelay = keyframes`
 `;
 const StyledImage = styled(Image)`
   animation: ${swing} 2s ease-in-out, ${swingWithDelay} 4s linear infinite;
- 
 `;
 const FooterStyle = styled.footer`
   width: 100%;
@@ -116,7 +125,6 @@ const FooterAnimatedLinks = styled.div`
     }
   }
 `;
-
 
 const FooterInfo = styled.div`
   display: flex;

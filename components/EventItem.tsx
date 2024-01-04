@@ -350,7 +350,7 @@ const OpenClose = styled.div`
   margin-left: 30%;
   position: absolute;
 `;
-const EventCategoryTitle = styled.text`
+const EventCategoryTitle = styled.p`
   color: #f64a45;
   font-size: 22px;
   margin-bottom: 5px;
@@ -533,7 +533,6 @@ const AccordionContent = styled.div`
   align-items: center;
   text-align: center;
   gap: 10px;
-
 `;
 
 const ButtonContainer = styled.div`

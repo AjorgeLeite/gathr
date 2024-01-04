@@ -15,36 +15,36 @@ const LoginRegister = () => {
             height={35}
           ></Image>
         </TopBar>
-        <StyledImage 
-        src="/assets/5.jpg"
-            alt="celebration"
-            width={1000}
-            height={600}
-            >
-        </StyledImage>
-            <LoginRegisterContainer>
-              <LoginText>Log in, Sign up, and start inviting your friends!</LoginText>
-    <LoginRegisterComp />
-    </LoginRegisterContainer>
-    </PageContainer>
+        <StyledImage
+          src="/assets/5.jpg"
+          alt="celebration"
+          width={1000}
+          height={600}
+        ></StyledImage>
+        <LoginRegisterContainer>
+          <LoginText>
+            Log in, Sign up, and start inviting your friends!
+          </LoginText>
+          <LoginRegisterComp />
+        </LoginRegisterContainer>
+      </PageContainer>
     </>
   );
 };
 const LoginText = styled.h2`
- margin-right: 30px;
- font-size: 55px;
- text-align: center;
- color:white;
+  margin-right: 30px;
+  font-size: 55px;
+  text-align: center;
+  color: white;
 
   @media screen and (max-width: 1280px) {
     margin-right: 0px;
- font-size: 45px;
+    font-size: 45px;
     flex-direction: column;
     width: 80%;
     margin-top: 27%;
     margin-bottom: -5%;
   }
-
 `;
 
 const TopBar = styled.div`
@@ -67,39 +67,38 @@ const StyledImage = styled(Image)`
 `;
 
 const PageContainer = styled.div`
-margin-top: -9%;
-background-color: #f3d8b6;
-width: 100%;
-height: auto;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 10px;
-color: #f3d8b6;
-overflow: hidden;
+  margin-top: -9%;
+  background-color: #f3d8b6;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #f3d8b6;
+  overflow: hidden;
 `;
 
 const LoginRegisterContainer = styled.div`
-margin-top: 12%;
-display: flex;
-justify-content: space-around;
-align-items: center;
-width: 50%;
-position: absolute;
-z-index:99;
-gap: 10px;
-h1 {
-  color:white;
-  font-size: 50px;
-  text-align: center;
-}
+  margin-top: 12%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 50%;
+  position: absolute;
+  z-index: 99;
+  gap: 10px;
+  h1 {
+    color: white;
+    font-size: 50px;
+    text-align: center;
+  }
 
-@media screen and (max-width: 1280px) {
+  @media screen and (max-width: 1280px) {
     flex-direction: column;
     width: 80%;
   }
-
 `;
 
 export default LoginRegister;

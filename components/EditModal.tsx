@@ -116,6 +116,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         setInvitedUsers(updatedInvitedUsers);
         const pollIds = event.polls_id?.map((poll) => poll.id) || [];
         console.log("useffectpollids", pollIds);
+        console.log("event", event);
         setNewPollIds(pollIds);
       } catch (error: any) {
         console.error("Error fetching event:", error.message);
@@ -245,7 +246,11 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
     const { name, value } = e.target;
 
-    if (name.startsWith("polls_id.")) {
+    if (name === "name" || name === "description") {
+      setUpdatedEvent((prevEvent) => ({
+        ...(prevEvent as Event),
+        [name]: value,
+      }));
     } else if (name.startsWith("newPoll.")) {
       setUpdatedEvent((prevEvent) => {
         if (!prevEvent) return prevEvent;
@@ -273,16 +278,24 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
       const invitedUserIds = invitedUsers.map((user) => user.invitedUserId);
 
-      console.log("asdasdsss", newPollIds);
+      const hasPollChanges =
+        JSON.stringify(newPollIds.sort()) !==
+        JSON.stringify(polls_id?.map((poll) => poll.id)?.sort());
+
+      console.log("ididididid", polls_id);
+      console.log("pollchange", hasPollChanges);
+
       const updatedEventData = {
         name: updatedEvent?.name || "",
         description: updatedEvent?.description || "",
         invited: updatedEvent?.invited || [],
-        polls_id: newPollIds,
+        polls_id: hasPollChanges
+          ? newPollIds
+          : polls_id?.map((poll) => poll.polls_id),
         created_by: updatedEvent?.created_by,
         going: updatedEvent?.going || [],
       };
-      console.log("ssss", updatedEventData);
+      console.log("updatedEventData", updatedEventData);
       await axios.patch(
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/events/${event.id}`,
         {
@@ -420,7 +433,10 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
             </div>
           </PollDisplayContainer>
           <InputContainer>
-            <BtnMedium onClick={() => handleSaveEvent(updatedEvent)}>
+            <BtnMedium
+              data-testid="edit-event-button"
+              onClick={() => handleSaveEvent(updatedEvent)}
+            >
               Edit Event
             </BtnMedium>
             <BtnMedium onClick={onCancel}>Cancel</BtnMedium>

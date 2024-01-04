@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styled, { css, keyframes } from "styled-components";
 import Link from "next/link";
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../store/action-creators/actions';
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store/action-creators/actions";
 import { useRouter } from "next/router";
-import { destroyCookie } from 'nookies';
+import { destroyCookie } from "nookies";
 
 interface NavbarStyleProps extends React.HTMLAttributes<HTMLDivElement> {
-  $mobileMenuOpen?: boolean; 
+  $mobileMenuOpen?: boolean;
 }
-
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,8 +27,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    destroyCookie(null, 'authToken');
-    router.push('/');
+    destroyCookie(null, "authToken");
+    router.push("/");
   };
 
   const navigateTo = (path: string) => {
@@ -39,16 +38,15 @@ const Navbar = () => {
 
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.classList.add('mobile-menu-open');
+      document.body.classList.add("mobile-menu-open");
     } else {
-      document.body.classList.remove('mobile-menu-open');
+      document.body.classList.remove("mobile-menu-open");
     }
   }, [mobileMenuOpen]);
 
   return (
     <>
       <NavbarStyle $mobileMenuOpen={mobileMenuOpen}>
-
         <LogoContainer>
           <Link href={"/"}>
             <StyledImage
@@ -59,9 +57,8 @@ const Navbar = () => {
             />
           </Link>
 
-
           <MobileMenuButton onClick={toggleMobileMenu}>
-          <BurgerIcon
+            <BurgerIcon
               src="/assets/burgericon.gif"
               alt="gathr logo"
               width={50}
@@ -69,7 +66,6 @@ const Navbar = () => {
             />
           </MobileMenuButton>
         </LogoContainer>
-
 
         <NavbarLinks>
           <Link href={"/about"}>
@@ -87,7 +83,6 @@ const Navbar = () => {
           )}
         </NavbarLinks>
 
-
         {mobileMenuOpen && (
           <MobileMenu>
             <div>
@@ -98,7 +93,9 @@ const Navbar = () => {
                 My Events
               </NavbarAnimatedLinks>
               {userData.isLoggedIn ? (
-                <NavbarAnimatedLinks onClick={handleLogout}>Logout</NavbarAnimatedLinks>
+                <NavbarAnimatedLinks onClick={handleLogout}>
+                  Logout
+                </NavbarAnimatedLinks>
               ) : (
                 <NavbarBtn onClick={() => navigateTo("/login")}>
                   Login/Register
@@ -116,12 +113,10 @@ const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  
 
   @media (max-width: 768px) {
     justify-content: space-around;
   }
-
 `;
 
 const NavbarStyle: React.FC<NavbarStyleProps> = styled.nav<NavbarStyleProps>`
@@ -160,7 +155,7 @@ const NavbarLinks = styled.div`
   align-items: center;
 
   @media (max-width: 768px) {
-    display: none; 
+    display: none;
   }
 `;
 const swing = keyframes`
@@ -244,11 +239,9 @@ const NavbarAnimatedLinks = styled.div`
     }
   }
 
-
   @media (max-width: 768px) {
     margin-bottom: 10px;
   }
-
 `;
 
 const MobileMenuButton = styled.div`
@@ -276,11 +269,10 @@ const MobileMenu = styled.div`
   flex-direction: column;
   align-items: center;
   z-index: 100;
-  overflow: hidden; 
+  overflow: hidden;
   text-align: center;
   color: #f64a45;
   padding: 10px;
 `;
-
 
 export default Navbar;
