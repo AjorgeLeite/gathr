@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import axios from "axios";
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import EventItem from "@/components/EventItem";
 import LoginRegisterComp from "@/components/LoginRegisterComp";
@@ -24,9 +24,23 @@ type Poll = {
   option_1: string;
   option_2: string;
   option_3: string;
+  option_4: any;
+  option_5: any;
+  option_6: any;
+  option_7: any;
+  option_8: any;
+  option_9: any;
+  option_10: any;
   vote_1: number;
   vote_2: number;
   vote_3: number;
+  vote_4: number;
+  vote_5: number;
+  vote_6: number;
+  vote_7: number;
+  vote_8: number;
+  vote_9: number;
+  vote_10: number;
   already_voted: number[];
   polls_id?: number[];
 };
@@ -47,9 +61,23 @@ type Event = {
     option_1: string;
     option_2: string;
     option_3: string;
+    option_4: any;
+    option_5: any;
+    option_6: any;
+    option_7: any;
+    option_8: any;
+    option_9: any;
+    option_10: any;
     vote_1: number;
     vote_2: number;
     vote_3: number;
+    vote_4: number;
+    vote_5: number;
+    vote_6: number;
+    vote_7: number;
+    vote_8: number;
+    vote_9: number;
+    vote_10: number;
     already_voted: number[];
     polls_id?: number[];
   };
@@ -117,6 +145,14 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const userData = useSelector((userData: any) => userData.user.user);
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log("isloggedin",userData.isLoggedIn)
+    if (!userData.isLoggedIn) {
+      router.push("/login");
+    }
+  }, [userData.isLoggedIn, router]);
 
   const myCreatedEvents = events.filter(
     (event) => event.created_by === userData.userId
@@ -151,98 +187,71 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
     setCurrentEvent(null);
   };
 
-  const router = useRouter();
-
   return (
     <>
-      {userData.isLoggedIn === false ? (
-        <PageContainer>
-          <TopBar>
-            <Image
-              src="/assets/LOGOPNGBEIJE.png"
-              alt="gathr logo"
-              width={80}
-              height={35}
-            ></Image>
-          </TopBar>
-          <StyledImage
-            src="/assets/2.jpg"
-            alt="celebration"
-            width={1000}
-            height={600}
-          ></StyledImage>
-          <LoginRegisterContainer>
-            <LoginText>
-              Log in, Sign up, and start inviting your friends!
-            </LoginText>
-            <LoginRegisterComp />
-          </LoginRegisterContainer>
-        </PageContainer>
-      ) : (
-        <EventsPageContainer>
-          <RedTitle>Events</RedTitle>
-          <Link href={"/newevents"}>
-            <CreateEventBtn>Create a New Event</CreateEventBtn>
-          </Link>
-          {isEditing && currentEvent ? (
-            <EditEvent
-              event={currentEvent}
-              onCancel={handleCancelEdit}
-              onSave={() => {}}
-              title={""}
-              openIndex={null}
-              onDeleteEvent={function (eventId: number): void {
-                throw new Error("Function not implemented.");
-              }}
-              onEditEvent={(event: Event) => handleEditEvent({ ...event })}
-              setOpenIndex={function (index: number | null): void {
-                throw new Error("Function not implemented.");
-              }}
+      <EventsPageContainer>
+        <RedTitle>Events</RedTitle>
+        <Link href={"/newevents"}>
+          <CreateEventBtn>Create a New Event</CreateEventBtn>
+        </Link>
+        {isEditing && currentEvent ? (
+          <EditEvent
+            event={currentEvent}
+            onCancel={handleCancelEdit}
+            onSave={() => {}}
+            title={""}
+            openIndex={null}
+            onDeleteEvent={function (eventId: number): void {
+              throw new Error("Function not implemented.");
+            }}
+            onEditEvent={(event: Event) => handleEditEvent({ ...event })}
+            setOpenIndex={function (index: number | null): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        ) : (
+          <>
+            <EventItem
+              title="My Created Events"
+              events={myCreatedEvents}
+              openIndex={openIndexes[0]}
+              onDeleteEvent={(eventId: number) =>
+                handleDeleteEvent(eventId, router)
+              }
+              onEditEvent={handleEditEvent}
+              setOpenIndex={(index: number | null) =>
+                handleOpenIndexChange(0, index)
+              }
             />
-          ) : (
-            <>
-              <EventItem
-                title="My Created Events"
-                events={myCreatedEvents}
-                openIndex={openIndexes[0]}
-                onDeleteEvent={(eventId: number) =>
-                  handleDeleteEvent(eventId, router)
-                }
-                onEditEvent={handleEditEvent}
-                setOpenIndex={(index: number | null) =>
-                  handleOpenIndexChange(0, index)
-                }
-              />
 
-              <EventItem
-                title="Invited Events"
-                events={invitedEvents}
-                openIndex={openIndexes[1]}
-                onDeleteEvent={(eventId: number) =>
-                  handleDeleteEvent(eventId, router)
-                }
-                onEditEvent={handleEditEvent}
-                setOpenIndex={(index: number | null) =>
-                  handleOpenIndexChange(1, index)
-                }
-              />
+            <EventItem
+              title="Invited Events"
+              events={invitedEvents}
+              openIndex={openIndexes[1]}
+              onDeleteEvent={(eventId: number) =>
+                handleDeleteEvent(eventId, router)
+              }
+              onEditEvent={handleEditEvent}
+              setOpenIndex={(index: number | null) =>
+                handleOpenIndexChange(1, index)
+              }
+            />
 
-              <EventItem
-                title="Going Events"
-                events={goingEvents}
-                openIndex={openIndexes[2]}
-                onDeleteEvent={(eventId: number) =>
-                  handleDeleteEvent(eventId, router)
-                }
-                onEditEvent={handleEditEvent}
-                setOpenIndex={(index: number | null) =>
-                  handleOpenIndexChange(2, index)
-                }
-              />
-            </>
-          )}
-        </EventsPageContainer>
-      )}
+            <EventItem
+              title="Going Events"
+              events={goingEvents}
+              openIndex={openIndexes[2]}
+              onDeleteEvent={(eventId: number) =>
+                handleDeleteEvent(eventId, router)
+              }
+              onEditEvent={handleEditEvent}
+              setOpenIndex={(index: number | null) =>
+                handleOpenIndexChange(2, index)
+              }
+            />
+          </>
+        )}
+      </EventsPageContainer>
     </>
   );
 };

@@ -5,12 +5,16 @@ import Head from "next/head";
 import { Provider } from "react-redux";
 import store from "../store/store";
 import { loginSuccess } from "@/store/action-creators/actions";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import axios from "axios";
 import React from "react";
+import styled from "styled-components";
+import Image from "next/image";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [isUserInfoLoaded, setIsUserInfoLoaded] = useState(false);
+
   useEffect(() => {
     async function checkAuthToken() {
       const { authToken } = parseCookies();
@@ -23,14 +27,22 @@ export default function App({ Component, pageProps }: AppProps) {
           );
 
           store.dispatch(loginSuccess(userInfo.data.name, userInfo.data.id));
+          setIsUserInfoLoaded(true);
         } catch (error) {
           console.error("Error fetching user information:", error);
+          setIsUserInfoLoaded(true);
         }
+      } else {
+        setIsUserInfoLoaded(true);
       }
     }
 
     checkAuthToken();
   }, []);
+
+  if (!isUserInfoLoaded) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -48,3 +60,30 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+const Loading: React.FC = () => {
+  return (
+    <LoadingContainer>
+      <StyledImage
+        src={"/assets/loading1.5s.gif"}
+        alt={"About"}
+        width={1000}
+        height={600}
+      ></StyledImage>
+    </LoadingContainer>
+  );
+};
+
+const LoadingContainer = styled.div`
+  background-color: #f3d8b6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+`;
+
+const StyledImage = styled(Image)`
+  width: 20vw;
+  height: 40vh;
+`;

@@ -18,9 +18,23 @@ type Poll = {
   option_1: string;
   option_2: string;
   option_3: string;
+  option_4: any;
+  option_5: any;
+  option_6: any;
+  option_7: any;
+  option_8: any;
+  option_9: any;
+  option_10: any;
   vote_1: number;
   vote_2: number;
   vote_3: number;
+  vote_4: number;
+  vote_5: number;
+  vote_6: number;
+  vote_7: number;
+  vote_8: number;
+  vote_9: number;
+  vote_10: number;
   already_voted: number[];
   polls_id?: number[];
 };
@@ -41,9 +55,23 @@ type Event = {
     option_1: string;
     option_2: string;
     option_3: string;
+    option_4: any;
+    option_5: any;
+    option_6: any;
+    option_7: any;
+    option_8: any;
+    option_9: any;
+    option_10: any;
     vote_1: number;
     vote_2: number;
     vote_3: number;
+    vote_4: number;
+    vote_5: number;
+    vote_6: number;
+    vote_7: number;
+    vote_8: number;
+    vote_9: number;
+    vote_10: number;
     already_voted: number[];
     polls_id?: number[];
   };
@@ -71,6 +99,28 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   const [invitedUsers, setInvitedUsers] = useState<InvitedUser[]>([]);
   const [emailNotRegistered, setEmailNotRegistered] = useState(false);
   const [newPollIds, setNewPollIds] = useState<number[]>([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [pollErrorMsg, setPollErrorMsg] = useState("");
+  const [numOptions, setNumOptions] = useState(1);
+  const [pollOptions, setPollOptions] = useState<string[]>([""]);
+
+  const handleAddOption = () => {
+    if (numOptions < 10) {
+      setNumOptions((prevNumOptions) => prevNumOptions + 1);
+      setPollOptions((prevOptions) => [...prevOptions, ""]);
+    } else {
+      setPollErrorMsg("You cannot have more than 10 options");
+    }
+  };
+
+  const handleRemoveOption = (index: number) => {
+    setNumOptions((prevNumOptions) => prevNumOptions - 1);
+    setPollOptions((prevOptions) => {
+      const updatedOptions = [...prevOptions];
+      updatedOptions.splice(index, 1);
+      return updatedOptions;
+    });
+  };
 
   const handleDeletePoll = (pollIndex: number) => {
     if (!updatedEvent) return;
@@ -158,6 +208,22 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   };
 
   const handleAddPoll = async () => {
+    const newPollName = (updatedEvent?.newPoll?.name || "").trim();
+    const newPollOptions = Array.from(
+      { length: numOptions },
+      (_, index) =>
+        (
+          (updatedEvent?.newPoll?.[
+            `option_${index + 1}` as keyof typeof updatedEvent.newPoll
+          ] as string) || ""
+        ).trim() || ""
+    );
+
+    if (!newPollName || newPollOptions.some((option) => !option)) {
+      setPollErrorMsg("Poll name and options cannot be empty.");
+      return;
+    }
+
     try {
       const optionsResponse = await axios.post(
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
@@ -166,9 +232,23 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           option_1: updatedEvent?.newPoll?.option_1 || "",
           option_2: updatedEvent?.newPoll?.option_2 || "",
           option_3: updatedEvent?.newPoll?.option_3 || "",
+          option_4: updatedEvent?.newPoll?.option_1 || "",
+          option_5: updatedEvent?.newPoll?.option_2 || "",
+          option_6: updatedEvent?.newPoll?.option_3 || "",
+          option_7: updatedEvent?.newPoll?.option_1 || "",
+          option_8: updatedEvent?.newPoll?.option_2 || "",
+          option_9: updatedEvent?.newPoll?.option_3 || "",
+          option_10: updatedEvent?.newPoll?.option_3 || "",
           vote_1: 0,
           vote_2: 0,
           vote_3: 0,
+          vote_4: 0,
+          vote_5: 0,
+          vote_6: 0,
+          vote_7: 0,
+          vote_8: 0,
+          vote_9: 0,
+          vote_10: 0,
           already_voted: [],
           poll_id: 0,
         }
@@ -183,9 +263,23 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         option_1: updatedEvent?.newPoll?.option_1 || "",
         option_2: updatedEvent?.newPoll?.option_2 || "",
         option_3: updatedEvent?.newPoll?.option_3 || "",
+        option_4: updatedEvent?.newPoll?.option_1 || "",
+        option_5: updatedEvent?.newPoll?.option_2 || "",
+        option_6: updatedEvent?.newPoll?.option_3 || "",
+        option_7: updatedEvent?.newPoll?.option_1 || "",
+        option_8: updatedEvent?.newPoll?.option_2 || "",
+        option_9: updatedEvent?.newPoll?.option_3 || "",
+        option_10: updatedEvent?.newPoll?.option_3 || "",
         vote_1: 0,
         vote_2: 0,
         vote_3: 0,
+        vote_4: 0,
+        vote_5: 0,
+        vote_6: 0,
+        vote_7: 0,
+        vote_8: 0,
+        vote_9: 0,
+        vote_10: 0,
         already_voted: [],
         polls_id: [],
       };
@@ -227,13 +321,28 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           option_1: updatedEvent?.newPoll?.option_1 || "",
           option_2: updatedEvent?.newPoll?.option_2 || "",
           option_3: updatedEvent?.newPoll?.option_3 || "",
+          option_4: updatedEvent?.newPoll?.option_1 || "",
+          option_5: updatedEvent?.newPoll?.option_2 || "",
+          option_6: updatedEvent?.newPoll?.option_3 || "",
+          option_7: updatedEvent?.newPoll?.option_1 || "",
+          option_8: updatedEvent?.newPoll?.option_2 || "",
+          option_9: updatedEvent?.newPoll?.option_3 || "",
+          option_10: updatedEvent?.newPoll?.option_3 || "",
           vote_1: 0,
           vote_2: 0,
           vote_3: 0,
+          vote_4: 0,
+          vote_5: 0,
+          vote_6: 0,
+          vote_7: 0,
+          vote_8: 0,
+          vote_9: 0,
+          vote_10: 0,
           already_voted: [],
           polls_id: newPollId,
         }
       );
+      setPollErrorMsg("");
     } catch (error) {
       console.error("Error creating poll:", error);
     }
@@ -273,6 +382,14 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
     const { authToken } = parseCookies();
 
+    if (
+      updatedEvent.name.trim() === "" ||
+      updatedEvent.description.trim() === ""
+    ) {
+      setErrorMsg("Event name and description cannot be empty.");
+      return;
+    }
+
     try {
       const { polls_id, ...eventData } = updatedEvent;
 
@@ -308,9 +425,10 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           },
         }
       );
-
+      setErrorMsg("");
       onSave(updatedEvent);
-      router.reload();
+      router.push("/events");
+      onCancel();
     } catch (error: any) {
       console.error("Error updating event:", error.message);
     }
@@ -377,12 +495,76 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
               updatedEvent.polls_id.map((poll, pollIndex) => (
                 <PollDisplay key={pollIndex}>
                   <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
-                  <p>{`Option 1: ${poll.option_1}`}</p>
-                  <p>{`Votes: ${poll.vote_1}`}</p>
-                  <p>{`Option 2: ${poll.option_2}`}</p>
-                  <p>{`Votes: ${poll.vote_2}`}</p>
-                  <p>{`Option 3: ${poll.option_3}`}</p>
-                  <p>{`Votes: ${poll.vote_3}`}</p>
+                  <br />
+
+                  {poll.option_1 && (
+                    <>
+                      <p>{`Option 1: ${poll.option_1}`}</p>
+                      <p>{`Votes: ${poll.vote_1}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_2 && (
+                    <>
+                      <p>{`Option 2: ${poll.option_2}`}</p>
+                      <p>{`Votes: ${poll.vote_2}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_3 && (
+                    <>
+                      <p>{`Option 3: ${poll.option_3}`}</p>
+                      <p>{`Votes: ${poll.vote_3}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_4 && (
+                    <>
+                      <p>{`Option 4: ${poll.option_4}`}</p>
+                      <p>{`Votes: ${poll.vote_4}`}</p>
+                    </>
+                  )}
+                  {poll.option_5 && (
+                    <>
+                      <p>{`Option 5: ${poll.option_5}`}</p>
+                      <p>{`Votes: ${poll.vote_5}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_6 && (
+                    <>
+                      <p>{`Option 6: ${poll.option_6}`}</p>
+                      <p>{`Votes: ${poll.vote_6}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_7 && (
+                    <>
+                      <p>{`Option 7: ${poll.option_7}`}</p>
+                      <p>{`Votes: ${poll.vote_7}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_8 && (
+                    <>
+                      <p>{`Option 8: ${poll.option_8}`}</p>
+                      <p>{`Votes: ${poll.vote_8}`}</p>
+                    </>
+                  )}
+                  {poll.option_9 && (
+                    <>
+                      <p>{`Option 9: ${poll.option_9}`}</p>
+                      <p>{`Votes: ${poll.vote_9}`}</p>
+                    </>
+                  )}
+
+                  {poll.option_10 && (
+                    <>
+                      <p>{`Option 10: ${poll.option_10}`}</p>
+                      <p>{`Votes: ${poll.vote_10}`}</p>
+                    </>
+                  )}
+
                   <br />
                   <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
                     Delete Poll
@@ -390,6 +572,9 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                 </PollDisplay>
               ))}
           </PollDisplayContainer>
+          <TextWarning>
+            Polls cannot be edited. Please remove and create a new one.
+          </TextWarning>
           <PollDisplayContainer>
             <div>
               <InputContainer>
@@ -401,35 +586,35 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                   value={updatedEvent?.newPoll?.name || ""}
                 />
               </InputContainer>
-              <InputContainer>
-                <label>Option 1:</label>
-                <InputStyled
-                  type="text"
-                  name="newPoll.option_1"
-                  onChange={handleInputChange}
-                  value={updatedEvent?.newPoll?.option_1 || ""}
-                />
-              </InputContainer>
-              <InputContainer>
-                <label>Option 2:</label>
-                <InputStyled
-                  type="text"
-                  name="newPoll.option_2"
-                  onChange={handleInputChange}
-                  value={updatedEvent?.newPoll?.option_2 || ""}
-                />
-              </InputContainer>
-              <InputContainer>
-                <label>Option 3:</label>
-                <InputStyled
-                  type="text"
-                  name="newPoll.option_3"
-                  onChange={handleInputChange}
-                  value={updatedEvent?.newPoll?.option_3 || ""}
-                />
-              </InputContainer>
-
-              <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
+              {pollOptions.map((option, index) => (
+                <InputContainer key={index}>
+                  <label>{`Option ${index + 1}:`}</label>
+                  <InputStyled
+                    type="text"
+                    name={`newPoll.option_${index + 1}`}
+                    onChange={handleInputChange}
+                    value={
+                      (updatedEvent?.newPoll?.[
+                        `option_${
+                          index + 1
+                        }` as keyof typeof updatedEvent.newPoll
+                      ] as string) || ""
+                    }
+                  />
+                  <BtnSmallBeije onClick={() => handleRemoveOption(index)}>
+                Remove 
+              </BtnSmallBeije>
+                </InputContainer>
+              ))}
+              <PollBtnContainer>
+                <BtnSmallBeije onClick={handleAddOption}>
+                  Add Option
+                </BtnSmallBeije>
+                <BtnSmallBeije onClick={handleAddPoll}>
+                  Add Poll To Event
+                </BtnSmallBeije>
+              </PollBtnContainer>
+              <TextWarningBeije>{pollErrorMsg}</TextWarningBeije>
             </div>
           </PollDisplayContainer>
           <InputContainer>
@@ -439,8 +624,10 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
             >
               Edit Event
             </BtnMedium>
+
             <BtnMedium onClick={onCancel}>Cancel</BtnMedium>
           </InputContainer>
+          <TextWarning>{errorMsg}</TextWarning>
         </>
       ) : (
         <Image
@@ -454,6 +641,13 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   );
 };
 
+const PollBtnContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+`;
 const PollDisplay = styled.div`
   border: 1px solid #f3d8b6;
   border-radius: 20px;
@@ -500,6 +694,10 @@ const InputStyled = styled.input`
 
 const TextWarning = styled.h3`
   color: #f64a45;
+  text-align: center;
+`;
+const TextWarningBeije = styled.h3`
+  color: #f3d8b6;
 `;
 
 const EventEditContainers = styled.div`
@@ -517,6 +715,10 @@ const InputContainer = styled.div`
   gap: 2%;
   justify-content: center;
   align-items: center;
+
+  @media screen and (max-width: 728px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const BtnSmall = styled.button`
@@ -552,6 +754,7 @@ const BtnMedium = styled.button`
 `;
 
 const BtnSmallBeije = styled.button`
+margin-bottom: 3%;
   padding: 5px;
   width: auto;
   border-radius: 10px;

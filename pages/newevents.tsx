@@ -27,6 +27,8 @@ const NewEvent: React.FC = () => {
   const [addedPolls, setAddedPolls] = useState<PollOption[]>([]);
   const [pollOptionIds, setPollOptionIds] = useState<number[]>([]);
   const [emailNotRegistered, setEmailNotRegistered] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [pollErrorMsg, setPollErrorMsg] = useState("");
 
   const userId = useSelector((state: any) => state.user?.user?.userId);
 
@@ -88,9 +90,11 @@ const NewEvent: React.FC = () => {
 
   const handleAddOption = (pollIndex: number) => {
     const updatedPolls = [...polls];
-    if (updatedPolls[pollIndex].options.length < 3) {
+    if (updatedPolls[pollIndex].options.length < 10) {
       updatedPolls[pollIndex].options.push("");
       setPolls(updatedPolls);
+    } else {
+      setPollErrorMsg("You've reached the maximum options for this poll.");
     }
   };
 
@@ -107,9 +111,21 @@ const NewEvent: React.FC = () => {
   };
 
   const handleAddToEvent = async (pollIndex: number) => {
-    try {
-      const selectedPoll = polls[pollIndex];
+    const selectedPoll = polls[pollIndex];
 
+    if (selectedPoll.options.every((option) => option.trim() === "")) {
+      setPollErrorMsg("You need to have at least one option.");
+      return;
+    }
+
+    if (
+      selectedPoll.name.trim() === "" ||
+      selectedPoll.options.some((option) => option.trim() === "")
+    ) {
+      setPollErrorMsg("Poll name and options cannot be empty.");
+      return;
+    }
+    try {
       const response = await axios.post(
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
         {
@@ -118,9 +134,23 @@ const NewEvent: React.FC = () => {
           option_1: selectedPoll.options[0] || "",
           option_2: selectedPoll.options[1] || "",
           option_3: selectedPoll.options[2] || "",
+          option_4: selectedPoll.options[3] || "",
+          option_5: selectedPoll.options[4] || "",
+          option_6: selectedPoll.options[5] || "",
+          option_7: selectedPoll.options[6] || "",
+          option_8: selectedPoll.options[7] || "",
+          option_9: selectedPoll.options[8] || "",
+          option_10: selectedPoll.options[9] || "",
           vote_1: 0,
           vote_2: 0,
           vote_3: 0,
+          vote_4: 0,
+          vote_5: 0,
+          vote_6: 0,
+          vote_7: 0,
+          vote_8: 0,
+          vote_9: 0,
+          vote_10: 0,
           already_voted: [],
         }
       );
@@ -137,7 +167,7 @@ const NewEvent: React.FC = () => {
       setPolls((prevPolls) =>
         prevPolls.filter((_, index) => index !== pollIndex)
       );
-
+      setPollErrorMsg("");
       return createdPollOption.id;
     } catch (error) {
       console.error("Error creating poll option:", error);
@@ -156,6 +186,10 @@ const NewEvent: React.FC = () => {
   };
 
   const handleSubmitEvent = async () => {
+    if (eventName.trim() === "" || eventDescription.trim() === "") {
+      setErrorMsg("Event name and description cannot be empty.");
+      return;
+    }
     try {
       const pollIds = [];
 
@@ -195,14 +229,28 @@ const NewEvent: React.FC = () => {
             option_1: addedPolls[i].options[0] || "",
             option_2: addedPolls[i].options[1] || "",
             option_3: addedPolls[i].options[2] || "",
+            option_4: addedPolls[i].options[3] || "",
+            option_5: addedPolls[i].options[4] || "",
+            option_6: addedPolls[i].options[5] || "",
+            option_7: addedPolls[i].options[6] || "",
+            option_8: addedPolls[i].options[7] || "",
+            option_9: addedPolls[i].options[8] || "",
+            option_10: addedPolls[i].options[9] || "",
             vote_1: 0,
             vote_2: 0,
             vote_3: 0,
+            vote_4: 0,
+            vote_5: 0,
+            vote_6: 0,
+            vote_7: 0,
+            vote_8: 0,
+            vote_9: 0,
+            vote_10: 0,
             already_voted: [],
           }
         );
       }
-
+      setErrorMsg("");
       router.push("/events");
     } catch (error) {
       console.error("Error:", error);
@@ -275,6 +323,11 @@ const NewEvent: React.FC = () => {
               />
 
               <label htmlFor="pollOptions">Options:</label>
+
+              <BtnSmall onClick={() => handleAddOption(pollIndex)}>
+                Add Option
+              </BtnSmall>
+
               {poll.options.map((option, optionIndex) => (
                 <div key={optionIndex}>
                   <input
@@ -286,25 +339,19 @@ const NewEvent: React.FC = () => {
                       handleOptionChange(e, pollIndex, optionIndex)
                     }
                   />
-                  {poll.options.length < 3 && (
-                    <BtnSmall onClick={() => handleAddOption(pollIndex)}>
-                      Add Option
-                    </BtnSmall>
-                  )}
-                  {optionIndex > 0 && (
-                    <BtnSmall
-                      onClick={() => handleRemoveOption(pollIndex, optionIndex)}
-                    >
-                      Remove Option
-                    </BtnSmall>
-                  )}
+
+                  <BtnSmall
+                    onClick={() => handleRemoveOption(pollIndex, optionIndex)}
+                  >
+                    Remove Option
+                  </BtnSmall>
                 </div>
               ))}
 
               <BtnSmall onClick={() => handleAddToEvent(pollIndex)}>
                 Add to Event
               </BtnSmall>
-
+              <TextWarning>{pollErrorMsg}</TextWarning>
               <BtnSmall onClick={() => handleRemovePollDisplay(pollIndex)}>
                 Remove Poll
               </BtnSmall>
@@ -331,15 +378,15 @@ const NewEvent: React.FC = () => {
         )}
 
         <BtnMedium onClick={handleSubmitEvent}>Create Event</BtnMedium>
+        <TextWarning>{errorMsg}</TextWarning>
       </FormContainer>
     </NewEventContainer>
   );
 };
 
-
-
 const AddedPollDisplay = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
   background-color: #f3d8b6;
   border-radius: 10px;
