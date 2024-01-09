@@ -164,10 +164,10 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         );
 
         setInvitedUsers(updatedInvitedUsers);
-        const pollIds = event.polls_id?.map((poll) => poll.id) || [];
+        const pollIds = event.polls_id?.map((poll) => poll.polls_id) || [];
         console.log("useffectpollids", pollIds);
         console.log("event", event);
-        setNewPollIds(pollIds);
+        setNewPollIds(pollIds.flat().filter(id => id !== undefined) as number[]);
       } catch (error: any) {
         console.error("Error fetching event:", error.message);
       }
@@ -318,7 +318,8 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
 
     setNewPollIds(updatedPrevPollsIds);
-    console.log("newpollids", updatedPrevPollsIds);
+    console.log("newpollids", newPollId);
+    console.log("updatedPrevPollsIds", updatedPrevPollsIds);
 
     await axios.patch(
       `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
