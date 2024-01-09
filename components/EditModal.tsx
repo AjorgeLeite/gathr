@@ -207,38 +207,86 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     }
   };
 
-  const handleAddPoll = async () => {
-    const newPollName = (updatedEvent?.newPoll?.name || "").trim();
-    const newPollOptions = Array.from(
-      { length: numOptions },
-      (_, index) =>
-        (
-          (updatedEvent?.newPoll?.[
-            `option_${index + 1}` as keyof typeof updatedEvent.newPoll
-          ] as string) || ""
-        ).trim() || ""
+ const handleAddPoll = async () => {
+  const newPollName = (updatedEvent?.newPoll?.name || "").trim();
+  const newPollOptions = Array.from(
+    { length: numOptions },
+    (_, index) =>
+      (
+        (updatedEvent?.newPoll?.[
+          `option_${index + 1}` as keyof typeof updatedEvent.newPoll
+        ] as string) || ""
+      ).trim() || ""
+  );
+
+  const selectedOptions = newPollOptions.filter((option) => option !== "");
+
+  if (!newPollName || selectedOptions.length === 0) {
+    setPollErrorMsg("Poll name and at least one option are required.");
+    return;
+  }
+
+  try {
+    const optionsResponse = await axios.post(
+      "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
+      {
+        name: newPollName,
+        ...selectedOptions.reduce((acc, option, index) => {
+          (acc as Record<string, any>)[`option_${index + 1}`] = option;
+
+          return acc;
+        }, {}),
+      }
     );
 
-    if (!newPollName || newPollOptions.some((option) => !option)) {
-      setPollErrorMsg("Poll name and options cannot be empty.");
-      return;
-    }
+    const newOptionsId = optionsResponse.data.id;
 
-    try {
-      const optionsResponse = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
-        {
-          name: updatedEvent?.newPoll?.name || "",
-          option_1: updatedEvent?.newPoll?.option_1 || "",
-          option_2: updatedEvent?.newPoll?.option_2 || "",
-          option_3: updatedEvent?.newPoll?.option_3 || "",
-          option_4: updatedEvent?.newPoll?.option_1 || "",
-          option_5: updatedEvent?.newPoll?.option_2 || "",
-          option_6: updatedEvent?.newPoll?.option_3 || "",
-          option_7: updatedEvent?.newPoll?.option_1 || "",
-          option_8: updatedEvent?.newPoll?.option_2 || "",
-          option_9: updatedEvent?.newPoll?.option_3 || "",
-          option_10: updatedEvent?.newPoll?.option_3 || "",
+    const newPoll: any = {
+      id: 0,
+      created_at: 0,
+      name: newPollName,
+      vote_1: 0,
+      vote_2: 0,
+      vote_3: 0,
+      vote_4: 0,
+      vote_5: 0,
+      vote_6: 0,
+      vote_7: 0,
+      vote_8: 0,
+      vote_9: 0,
+      vote_10: 0,
+      already_voted: [],
+      polls_id: [],
+      ...selectedOptions.reduce((acc, option, index) => {
+        (acc as Record<string, any>)[`option_${index + 1}`] = option;
+
+        return acc;
+      }, {}),
+    };
+
+    setUpdatedEvent((prevEvent) => {
+      if (!prevEvent) return prevEvent;
+
+      const updatedPolls = [...(prevEvent.polls_id || [])];
+      updatedPolls.push(newPoll);
+
+      return {
+        ...(prevEvent as Event),
+        polls_id: updatedPolls,
+        newPoll: {
+          id: 0,
+          created_at: 0,
+          name: "",
+          option_1: "",
+          option_2: "",
+          option_3: "",
+          option_4: "",
+          option_5: "",
+          option_6: "",
+          option_7: "",
+          option_8: "",
+          option_9: "",
+          option_10: "",
           vote_1: 0,
           vote_2: 0,
           vote_3: 0,
@@ -250,26 +298,38 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           vote_9: 0,
           vote_10: 0,
           already_voted: [],
-          poll_id: 0,
-        }
-      );
+          polls_id: [],
+        },
+      };
+    });
 
-      const newOptionsId = optionsResponse.data.id;
+    const pollResponse = await axios.post(
+      "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
+      {
+        name: newPollName,
+        poll_options_id: newOptionsId,
+      }
+    );
 
-      const newPoll = {
-        id: 0,
-        created_at: 0,
-        name: updatedEvent?.newPoll?.name || "",
-        option_1: updatedEvent?.newPoll?.option_1 || "",
-        option_2: updatedEvent?.newPoll?.option_2 || "",
-        option_3: updatedEvent?.newPoll?.option_3 || "",
-        option_4: updatedEvent?.newPoll?.option_1 || "",
-        option_5: updatedEvent?.newPoll?.option_2 || "",
-        option_6: updatedEvent?.newPoll?.option_3 || "",
-        option_7: updatedEvent?.newPoll?.option_1 || "",
-        option_8: updatedEvent?.newPoll?.option_2 || "",
-        option_9: updatedEvent?.newPoll?.option_3 || "",
-        option_10: updatedEvent?.newPoll?.option_3 || "",
+    const newPollId = pollResponse.data.id || 0;
+
+    const updatedPrevPollsIds = Array.from(new Set([...newPollIds, newPollId]));
+
+
+
+    setNewPollIds(updatedPrevPollsIds);
+    console.log("newpollids", updatedPrevPollsIds);
+
+    await axios.patch(
+      `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
+      {
+        name: newPollName,
+        ...selectedOptions.reduce((acc, option, index) => {
+          (acc as Record<string, any>)[`option_${index + 1}`] = option;
+
+
+          return acc;
+        }, {}),
         vote_1: 0,
         vote_2: 0,
         vote_3: 0,
@@ -281,72 +341,18 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         vote_9: 0,
         vote_10: 0,
         already_voted: [],
-        polls_id: [],
-      };
+        polls_id: newPollId,
+      }
+    );
 
-      setUpdatedEvent((prevEvent) => {
-        if (!prevEvent) return prevEvent;
+    setPollErrorMsg("");
+  } catch (error) {
+    console.error("Error creating poll:", error);
+  }
+};
 
-        const updatedPolls = [...(prevEvent.polls_id || [])];
-        updatedPolls.push(newPoll);
-
-        return {
-          ...(prevEvent as Event),
-          polls_id: updatedPolls,
-          newPoll: undefined,
-        };
-      });
-
-      const pollResponse = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
-        {
-          name: updatedEvent?.newPoll?.name || "",
-          poll_options_id: newOptionsId,
-        }
-      );
-
-      const prevPolls_ids = (updatedEvent?.polls_id || [])
-        .flatMap((poll) => poll.polls_id || [])
-        .filter((id): id is number => id !== undefined);
-
-      const newPollId = pollResponse.data.id || 0;
-      prevPolls_ids.push(newPollId);
-      setNewPollIds(prevPolls_ids);
-
-      console.log("newpullids: " + newPollId);
-      await axios.patch(
-        `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
-        {
-          name: updatedEvent?.newPoll?.name || "",
-          option_1: updatedEvent?.newPoll?.option_1 || "",
-          option_2: updatedEvent?.newPoll?.option_2 || "",
-          option_3: updatedEvent?.newPoll?.option_3 || "",
-          option_4: updatedEvent?.newPoll?.option_1 || "",
-          option_5: updatedEvent?.newPoll?.option_2 || "",
-          option_6: updatedEvent?.newPoll?.option_3 || "",
-          option_7: updatedEvent?.newPoll?.option_1 || "",
-          option_8: updatedEvent?.newPoll?.option_2 || "",
-          option_9: updatedEvent?.newPoll?.option_3 || "",
-          option_10: updatedEvent?.newPoll?.option_3 || "",
-          vote_1: 0,
-          vote_2: 0,
-          vote_3: 0,
-          vote_4: 0,
-          vote_5: 0,
-          vote_6: 0,
-          vote_7: 0,
-          vote_8: 0,
-          vote_9: 0,
-          vote_10: 0,
-          already_voted: [],
-          polls_id: newPollId,
-        }
-      );
-      setPollErrorMsg("");
-    } catch (error) {
-      console.error("Error creating poll:", error);
-    }
-  };
+  
+  
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
