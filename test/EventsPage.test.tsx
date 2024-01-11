@@ -9,6 +9,8 @@ describe("EventsPage", () => {
       {
         id: 1,
         created_at: 1639881900,
+        name: "Event Title",
+        description: "Event Description"
       },
     ];
     jest.spyOn(require("axios"), "get").mockResolvedValue({

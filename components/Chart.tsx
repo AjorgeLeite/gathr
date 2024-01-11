@@ -59,8 +59,8 @@ const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
           pollData.vote_9,
           pollData.vote_10,
         ],
-        backgroundColor: ["#f57265", "#f3d8b6", "#f48675"],
-        hoverBackgroundColor: ["#f57265", "#f3d8b6", "#f48675"],
+        backgroundColor: ["#f57265", "#f3d8b6", "#f48675", "#f64a45","#f55e55","#e0a080","#f8a090","#f57c64","#f69d8a","#f4a98a" ],
+        hoverBackgroundColor: ["#f57265", "#f3d8b6", "#f48675", "#f64a45","#f55e55","#e0a080","#f8a090","#f57c64","#f69d8a","#f4a98a"],
       },
     ],
   };

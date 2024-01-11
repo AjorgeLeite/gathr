@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import DoughnutChart from "./Chart";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -623,6 +623,18 @@ const AccordionItem = styled.div`
   }
 `;
 
+const fadeInOut = keyframes`
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
 const AccordionHeader = styled.div`
   min-width: 100%;
   background-color: #f64a45;
@@ -630,13 +642,13 @@ const AccordionHeader = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-around;
-  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  transition: background-color 0.3s ease-in-out;
+  
 
   &:hover {
-    transform: translateY(-5px);
+    animation: ${fadeInOut} 1.5s infinite;
   }
 `;
-
 const AccordionContent = styled.div`
   background-color: #f48675;
   padding: 10px;

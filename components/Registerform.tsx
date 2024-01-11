@@ -70,11 +70,22 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
 
       router.push("/events");
     } catch (error: any) {
+      let updatedErrorMessage =
+        error?.response?.data?.message || "An error occurred";
+
+      if (
+        updatedErrorMessage ===
+        "Input does not meet minimum length requirement of 8 characters"
+      ) {
+        updatedErrorMessage =
+          "Password minimum length requirement of 8 characters";
+      }
+
       setSubmitRequest({
         error: true,
         submitted: true,
         isLoading: false,
-        errorMessage: error?.response?.data?.message || "An error occurred",
+        errorMessage: updatedErrorMessage,
       });
     }
   };
@@ -114,7 +125,9 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
             }}
           />
           <SubmitBtn type="submit">Register</SubmitBtn>
-          {submitRequest.error && <p>{submitRequest.errorMessage}</p>}
+          <ErrorMsg>
+            {submitRequest.error && <p>{submitRequest.errorMessage}</p>}
+          </ErrorMsg>
           {!submitRequest.error && submitRequest.submitted && (
             <p>Account Created</p>
           )}
@@ -131,6 +144,12 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
     </>
   );
 };
+
+const ErrorMsg = styled.div`
+  width: 95%;
+  text-align: center;
+  margin-bottom: 4%;
+`;
 
 const TextColor = styled.h2`
   color: #f3d8b6;

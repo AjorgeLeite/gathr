@@ -2,8 +2,10 @@ import Image from "next/image";
 import styled, { keyframes } from "styled-components";
 import LoginRegisterComp from "@/components/LoginRegisterComp";
 import React from "react";
+import { useSelector } from "react-redux";
 
 export default function Home() {
+  const userData = useSelector((userData: any) => userData.user.user)
   return (
     <>
       <HomepageContainer>
@@ -38,12 +40,22 @@ export default function Home() {
             width={1000}
             height={600}
           ></StyledImage>
+          
+          {userData.isLoggedIn ? (
+            <HomepageInfoContentLoggedIn>
+            <HomepageInfoText>
+            <h1>Have fun with your friends! Create an event and invite them!</h1>
+          </HomepageInfoText>
+          </HomepageInfoContentLoggedIn>
+          ) : (
           <HomepageInfoContent>
             <HomepageInfoText>
               <h1>Log in, Sign up, and start inviting your friends!</h1>
             </HomepageInfoText>
             <LoginRegisterComp></LoginRegisterComp>
           </HomepageInfoContent>
+          )}
+            
         </HomepageInfo>
       </HomepageContainer>
     </>
@@ -164,6 +176,19 @@ const HomepageInfoContent = styled.div`
     flex-direction: column;
   }
 `;
+const HomepageInfoContentLoggedIn = styled.div`
+  width: 100%;
+  gap: 10%;
+  min-height: 700px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
 const HomepageInfoText = styled.div`
   font-size: 40px;
   min-width: 35%;
@@ -174,8 +199,6 @@ const HomepageInfoText = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  /* background-color: #f3d8b682;
-  border-radius: 20px; */
 
   @media screen and (max-width: 1280px) {
     font-size: 18px;

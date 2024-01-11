@@ -585,8 +585,9 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           <PollDisplayContainer>
             <div>
               <InputContainer>
-                <label>Poll Name:</label>
+                <label htmlFor="pollNameInput">Poll Name:</label>
                 <InputStyled
+                id="pollNameInput"
                   type="text"
                   name="newPoll.name"
                   onChange={handleInputChange}
@@ -595,8 +596,9 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
               </InputContainer>
               {pollOptions.map((option, index) => (
                 <InputContainer key={index}>
-                  <label>{`Option ${index + 1}:`}</label>
+                  <label htmlFor="optionInput">{`Option ${index + 1}:`}</label>
                   <InputStyled
+                  id="optionInput"
                     type="text"
                     name={`newPoll.option_${index + 1}`}
                     onChange={handleInputChange}

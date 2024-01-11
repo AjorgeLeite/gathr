@@ -16,6 +16,7 @@ type PollOption = {
   name: string;
   options: string[];
   pollOptionId?: number;
+  pollId?: number;
 };
 
 const NewEvent: React.FC = () => {
@@ -125,22 +126,27 @@ const NewEvent: React.FC = () => {
       setPollErrorMsg("Poll name and options cannot be empty.");
       return;
     }
+
     try {
-      const response = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
+      const pollResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
         {
-          polls_id: null,
           name: selectedPoll.name,
-          option_1: selectedPoll.options[0] || "",
-          option_2: selectedPoll.options[1] || "",
-          option_3: selectedPoll.options[2] || "",
-          option_4: selectedPoll.options[3] || "",
-          option_5: selectedPoll.options[4] || "",
-          option_6: selectedPoll.options[5] || "",
-          option_7: selectedPoll.options[6] || "",
-          option_8: selectedPoll.options[7] || "",
-          option_9: selectedPoll.options[8] || "",
-          option_10: selectedPoll.options[9] || "",
+          poll_options_id: [],
+        }
+      );
+
+      const createdPoll = pollResponse.data;
+      const pollId = createdPoll.id;
+
+      const options: { [key: string]: any } = selectedPoll.options.reduce(
+        (acc, option, optionIndex) => {
+          acc[`option_${optionIndex + 1}`] = option;
+          return acc;
+        },
+        {
+          polls_id: pollId,
+          name: selectedPoll.name,
           vote_1: 0,
           vote_2: 0,
           vote_3: 0,
@@ -152,26 +158,27 @@ const NewEvent: React.FC = () => {
           vote_9: 0,
           vote_10: 0,
           already_voted: [],
-        }
+        } as any
       );
 
-      const createdPollOption = response.data;
+      console.log("options: ", options);
+      const pollOptionResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
+        options
+      );
+
+      const pollOptionId = pollOptionResponse.data.id;
+
       setAddedPolls((prevAddedPolls) => [
         ...prevAddedPolls,
-        { ...selectedPoll, pollOptionId: createdPollOption.id },
-      ]);
-      setPollOptionIds((prevPollOptionIds) => [
-        ...prevPollOptionIds,
-        createdPollOption.id,
+        { ...selectedPoll, pollId, pollOptionIds: [pollOptionId] },
       ]);
       setPolls((prevPolls) =>
         prevPolls.filter((_, index) => index !== pollIndex)
       );
       setPollErrorMsg("");
-      return createdPollOption.id;
     } catch (error) {
-      console.error("Error creating poll option:", error);
-      return null;
+      console.error("Error creating poll and poll options:", error);
     }
   };
 
@@ -190,20 +197,12 @@ const NewEvent: React.FC = () => {
       setErrorMsg("Event name and description cannot be empty.");
       return;
     }
+
     try {
       const pollIds = [];
 
-      for (const poll of addedPolls) {
-        const pollResponse = await axios.post(
-          "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
-          {
-            name: poll.name,
-            poll_options_id: [poll.pollOptionId],
-          }
-        );
-
-        const createdPoll = pollResponse.data;
-        pollIds.push(createdPoll.id);
+      for (const addedPoll of addedPolls) {
+        pollIds.push(addedPoll.pollId);
       }
 
       const eventResponse = await axios.post(
@@ -217,43 +216,10 @@ const NewEvent: React.FC = () => {
         }
       );
 
-      for (let i = 0; i < addedPolls.length; i++) {
-        const pollId = pollIds[i];
-        const pollOptionId = addedPolls[i].pollOptionId;
-
-        await axios.patch(
-          `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${pollOptionId}`,
-          {
-            polls_id: pollId,
-            name: addedPolls[i].name,
-            option_1: addedPolls[i].options[0] || "",
-            option_2: addedPolls[i].options[1] || "",
-            option_3: addedPolls[i].options[2] || "",
-            option_4: addedPolls[i].options[3] || "",
-            option_5: addedPolls[i].options[4] || "",
-            option_6: addedPolls[i].options[5] || "",
-            option_7: addedPolls[i].options[6] || "",
-            option_8: addedPolls[i].options[7] || "",
-            option_9: addedPolls[i].options[8] || "",
-            option_10: addedPolls[i].options[9] || "",
-            vote_1: 0,
-            vote_2: 0,
-            vote_3: 0,
-            vote_4: 0,
-            vote_5: 0,
-            vote_6: 0,
-            vote_7: 0,
-            vote_8: 0,
-            vote_9: 0,
-            vote_10: 0,
-            already_voted: [],
-          }
-        );
-      }
       setErrorMsg("");
       router.push("/events");
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error creating event:", error);
     }
   };
 
@@ -298,7 +264,7 @@ const NewEvent: React.FC = () => {
         <InvitedEmails>
           <label htmlFor="eventPplInv">People Invited:</label>
           {invitedUsers.map((user, index) => (
-            <InvitedEmail key={index}>
+            <InvitedEmail id="eventPplInv" key={index}>
               {user.email}
               <DeleteInviteButton
                 onClick={() => handleDeleteInvite(user.email)}
@@ -316,6 +282,7 @@ const NewEvent: React.FC = () => {
               <label htmlFor="pollName">Poll Name:</label>
               <input
                 id="pollName"
+                data-testid="pollName"
                 type="text"
                 placeholder="Poll Name"
                 value={poll.name}
@@ -358,9 +325,7 @@ const NewEvent: React.FC = () => {
             </PoolWindow>
           ))}
 
-          {polls.length < 3 && addedPolls.length < 3 && (
-            <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
-          )}
+          <BtnSmallBeije onClick={handleAddPoll}>Add Poll</BtnSmallBeije>
         </PollsContainer>
 
         {addedPolls.length > 0 && (
