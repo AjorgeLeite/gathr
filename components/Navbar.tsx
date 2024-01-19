@@ -71,16 +71,20 @@ const Navbar = () => {
           <Link href={"/about"}>
             <NavbarAnimatedLinks>About Us</NavbarAnimatedLinks>
           </Link>
-          <Link href={"/events"}>
+          
+          {userData.isLoggedIn ? (
+          <>
+            <Link href={"/events"}>
             <NavbarAnimatedLinks>My Events</NavbarAnimatedLinks>
           </Link>
-          {userData.isLoggedIn ? (
-            <NavbarBtn onClick={handleLogout}>Logout</NavbarBtn>
+          <NavbarBtn onClick={handleLogout}>Logout</NavbarBtn>
+          </>
           ) : (
             <Link href={"/login"}>
               <NavbarBtn>Login/Register</NavbarBtn>
             </Link>
           )}
+          
         </NavbarLinks>
 
         {mobileMenuOpen && (

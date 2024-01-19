@@ -15,28 +15,11 @@ type Poll = {
   id: number;
   created_at: number;
   name: string;
-  option_1: string;
-  option_2: string;
-  option_3: string;
-  option_4: any;
-  option_5: any;
-  option_6: any;
-  option_7: any;
-  option_8: any;
-  option_9: any;
-  option_10: any;
-  vote_1: number;
-  vote_2: number;
-  vote_3: number;
-  vote_4: number;
-  vote_5: number;
-  vote_6: number;
-  vote_7: number;
-  vote_8: number;
-  vote_9: number;
-  vote_10: number;
+  options: string[];
+  votes: number[];
   already_voted: number[];
   polls_id?: number[];
+  [key: string]: string | number[] | number | string[] | undefined;
 };
 
 type Event = {
@@ -48,33 +31,7 @@ type Event = {
   going: User[];
   invited: User[];
   polls_id?: Poll[];
-  newPoll?: {
-    id: number;
-    created_at: number;
-    name: string;
-    option_1: string;
-    option_2: string;
-    option_3: string;
-    option_4: any;
-    option_5: any;
-    option_6: any;
-    option_7: any;
-    option_8: any;
-    option_9: any;
-    option_10: any;
-    vote_1: number;
-    vote_2: number;
-    vote_3: number;
-    vote_4: number;
-    vote_5: number;
-    vote_6: number;
-    vote_7: number;
-    vote_8: number;
-    vote_9: number;
-    vote_10: number;
-    already_voted: number[];
-    polls_id?: number[];
-  };
+  newPoll?: Poll;
 };
 
 type InvitedUser = {
@@ -128,8 +85,6 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     const updatedPolls = [...(updatedEvent.polls_id || [])];
     const deletedPollId = updatedPolls[pollIndex]?.id;
 
-    setNewPollIds((prevIds) => prevIds.filter((id) => id !== deletedPollId));
-
     updatedPolls.splice(pollIndex, 1);
 
     const remainingPollIds: number[] = updatedPolls
@@ -139,7 +94,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     setNewPollIds(remainingPollIds);
 
     setUpdatedEvent({
-      ...(updatedEvent as Event),
+      ...updatedEvent,
       polls_id: updatedPolls,
     });
   };
@@ -167,7 +122,9 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         const pollIds = event.polls_id?.map((poll) => poll.polls_id) || [];
         console.log("useffectpollids", pollIds);
         console.log("event", event);
-        setNewPollIds(pollIds.flat().filter(id => id !== undefined) as number[]);
+        setNewPollIds(
+          pollIds.flat().flatMap((id) => (id !== undefined ? [id] : []))
+        );
       } catch (error: any) {
         console.error("Error fetching event:", error.message);
       }
@@ -207,153 +164,111 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     }
   };
 
- const handleAddPoll = async () => {
-  const newPollName = (updatedEvent?.newPoll?.name || "").trim();
-  const newPollOptions = Array.from(
-    { length: numOptions },
-    (_, index) =>
-      (
-        (updatedEvent?.newPoll?.[
-          `option_${index + 1}` as keyof typeof updatedEvent.newPoll
-        ] as string) || ""
-      ).trim() || ""
-  );
-
-  const selectedOptions = newPollOptions.filter((option) => option !== "");
-
-  if (!newPollName || selectedOptions.length === 0) {
-    setPollErrorMsg("Poll name and at least one option are required.");
-    return;
-  }
-
-  try {
-    const optionsResponse = await axios.post(
-      "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
-      {
-        name: newPollName,
-        ...selectedOptions.reduce((acc, option, index) => {
-          (acc as Record<string, any>)[`option_${index + 1}`] = option;
-
-          return acc;
-        }, {}),
-      }
+  const handleAddPoll = async () => {
+    const newPollName = updatedEvent?.newPoll?.name?.trim() || "";
+    const newPollOptions = Array.from(
+      { length: numOptions },
+      (_, index) =>
+        String(updatedEvent?.newPoll?.[`option_${index + 1}`] || "").trim() ||
+        ""
     );
 
-    const newOptionsId = optionsResponse.data.id;
+    const selectedOptions = newPollOptions.filter((option) => option !== "");
 
-    const newPoll: any = {
-      id: 0,
-      created_at: 0,
-      name: newPollName,
-      vote_1: 0,
-      vote_2: 0,
-      vote_3: 0,
-      vote_4: 0,
-      vote_5: 0,
-      vote_6: 0,
-      vote_7: 0,
-      vote_8: 0,
-      vote_9: 0,
-      vote_10: 0,
-      already_voted: [],
-      polls_id: [],
-      ...selectedOptions.reduce((acc, option, index) => {
-        (acc as Record<string, any>)[`option_${index + 1}`] = option;
+    if (!newPollName || selectedOptions.length === 0) {
+      setPollErrorMsg("Poll name and at least one option are required.");
+      return;
+    }
 
-        return acc;
-      }, {}),
-    };
+    try {
+      const optionsResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
+        {
+          name: newPollName,
+          ...selectedOptions.reduce((acc, option, index) => {
+            acc[`option_${index + 1}`] = option;
+            return acc;
+          }, {} as Record<string, any>),
+        }
+      );
 
-    setUpdatedEvent((prevEvent) => {
-      if (!prevEvent) return prevEvent;
+      const newOptionsId = optionsResponse.data.id;
 
-      const updatedPolls = [...(prevEvent.polls_id || [])];
-      updatedPolls.push(newPoll);
-
-      return {
-        ...(prevEvent as Event),
-        polls_id: updatedPolls,
-        newPoll: {
-          id: 0,
-          created_at: 0,
-          name: "",
-          option_1: "",
-          option_2: "",
-          option_3: "",
-          option_4: "",
-          option_5: "",
-          option_6: "",
-          option_7: "",
-          option_8: "",
-          option_9: "",
-          option_10: "",
-          vote_1: 0,
-          vote_2: 0,
-          vote_3: 0,
-          vote_4: 0,
-          vote_5: 0,
-          vote_6: 0,
-          vote_7: 0,
-          vote_8: 0,
-          vote_9: 0,
-          vote_10: 0,
-          already_voted: [],
-          polls_id: [],
-        },
-      };
-    });
-
-    const pollResponse = await axios.post(
-      "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
-      {
+      const newPoll = {
+        id: 0,
+        created_at: 0,
         name: newPollName,
-        poll_options_id: newOptionsId,
-      }
-    );
-
-    const newPollId = pollResponse.data.id || 0;
-
-    const updatedPrevPollsIds = Array.from(new Set([...newPollIds, newPollId]));
-
-
-
-    setNewPollIds(updatedPrevPollsIds);
-    console.log("newpollids", newPollId);
-    console.log("updatedPrevPollsIds", updatedPrevPollsIds);
-
-    await axios.patch(
-      `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
-      {
-        name: newPollName,
-        ...selectedOptions.reduce((acc, option, index) => {
-          (acc as Record<string, any>)[`option_${index + 1}`] = option;
-
-
-          return acc;
-        }, {}),
-        vote_1: 0,
-        vote_2: 0,
-        vote_3: 0,
-        vote_4: 0,
-        vote_5: 0,
-        vote_6: 0,
-        vote_7: 0,
-        vote_8: 0,
-        vote_9: 0,
-        vote_10: 0,
         already_voted: [],
-        polls_id: newPollId,
-      }
-    );
+        polls_id: [],
+        ...selectedOptions.reduce((acc, option, index) => {
+          acc[`option_${index + 1}`] = option;
+          return acc;
+        }, {} as Record<string, any>),
+        options: selectedOptions,
+        votes: [],
+      };
 
-    setPollErrorMsg("");
-  } catch (error) {
-    console.error("Error creating poll:", error);
-  }
-};
+      setUpdatedEvent((prevEvent) => {
+        if (!prevEvent) return prevEvent;
 
-  
-  
+        const updatedPolls = [...(prevEvent.polls_id || [])];
+        updatedPolls.push(newPoll);
+
+        const updatedOptions: Record<string, string> = {};
+        selectedOptions.forEach((option, index) => {
+          updatedOptions[`Option ${index + 1}`] = option;
+        });
+
+        return {
+          ...prevEvent,
+          polls_id: updatedPolls,
+          newPoll: {
+            id: 0,
+            created_at: 0,
+            name: "",
+            already_voted: [],
+            polls_id: [],
+            options: selectedOptions,
+            votes: [],
+            ...updatedOptions,
+          },
+        };
+      });
+
+      const pollResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
+        {
+          name: newPollName,
+          poll_options_id: newOptionsId,
+        }
+      );
+
+      const newPollId = pollResponse.data.id || 0;
+
+      const updatedPrevPollsIds = Array.from(
+        new Set([...newPollIds, newPollId])
+      );
+
+      setNewPollIds(updatedPrevPollsIds);
+
+      await axios.patch(
+        `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
+        {
+          name: newPollName,
+          ...selectedOptions.reduce((acc, option, index) => {
+            acc[`option_${index + 1}`] = option;
+            return acc;
+          }, {} as Record<string, any>),
+          already_voted: [],
+          polls_id: newPollId,
+        }
+      );
+
+      setPollErrorMsg("");
+    } catch (error) {
+      console.error("Error creating poll:", error);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -363,10 +278,16 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     const { name, value } = e.target;
 
     if (name === "name" || name === "description") {
-      setUpdatedEvent((prevEvent) => ({
-        ...(prevEvent as Event),
-        [name]: value,
-      }));
+      setUpdatedEvent((prevEvent) => {
+        if (!prevEvent) return prevEvent;
+
+        const updatedState: Event = {
+          ...prevEvent,
+          [name]: value,
+        };
+
+        return updatedState;
+      });
     } else if (name.startsWith("newPoll.")) {
       setUpdatedEvent((prevEvent) => {
         if (!prevEvent) return prevEvent;
@@ -376,10 +297,23 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           [name.split(".")[1]]: value,
         };
 
-        return {
-          ...prevEvent,
-          newPoll: updatedNewPoll as Poll,
+        const tempNewPoll: Poll = {
+          id: 0,
+          created_at: 0,
+          name: "",
+          already_voted: [],
+          polls_id: [],
+          options: [],
+          votes: [],
+          ...updatedNewPoll,
         };
+
+        const updatedState: Event = {
+          ...prevEvent,
+          newPoll: tempNewPoll,
+        };
+
+        return updatedState;
       });
     }
   };
@@ -499,85 +433,46 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
           <PollDisplayContainer>
             {updatedEvent.polls_id &&
-              updatedEvent.polls_id.map((poll, pollIndex) => (
-                <PollDisplay key={pollIndex}>
-                  <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
-                  <br />
+              updatedEvent.polls_id.map((poll, pollIndex) => {
+                console.log("Poll Object:", poll);
 
-                  {poll.option_1 && (
-                    <>
-                      <p>{`Option 1: ${poll.option_1}`}</p>
-                      <p>{`Votes: ${poll.vote_1}`}</p>
-                    </>
-                  )}
+                return (
+                  <PollDisplay key={pollIndex}>
+                    <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
+                    <br />
 
-                  {poll.option_2 && (
-                    <>
-                      <p>{`Option 2: ${poll.option_2}`}</p>
-                      <p>{`Votes: ${poll.vote_2}`}</p>
-                    </>
-                  )}
+                    {Object.keys(poll)
+                      .filter((key) => key.startsWith("option_"))
+                      .map((optionKey, index) => {
+                        const optionValue = poll[optionKey]!.toString().trim();
 
-                  {poll.option_3 && (
-                    <>
-                      <p>{`Option 3: ${poll.option_3}`}</p>
-                      <p>{`Votes: ${poll.vote_3}`}</p>
-                    </>
-                  )}
+                        if (optionValue !== "") {
+                          const voteKey = `vote_${index + 1}`;
+                          const voteCount =
+                            poll[voteKey] !== undefined ? poll[voteKey] : 0;
 
-                  {poll.option_4 && (
-                    <>
-                      <p>{`Option 4: ${poll.option_4}`}</p>
-                      <p>{`Votes: ${poll.vote_4}`}</p>
-                    </>
-                  )}
-                  {poll.option_5 && (
-                    <>
-                      <p>{`Option 5: ${poll.option_5}`}</p>
-                      <p>{`Votes: ${poll.vote_5}`}</p>
-                    </>
-                  )}
+                          return (
+                            <div key={index}>
+                              <p>{`Option: ${optionValue}`}</p>
+                              {voteCount !== 0 ? (
+                                <p>{`Votes: ${voteCount}`}</p>
+                              ) : (
+                                <p>No votes</p>
+                              )}
+                            </div>
+                          );
+                        }
 
-                  {poll.option_6 && (
-                    <>
-                      <p>{`Option 6: ${poll.option_6}`}</p>
-                      <p>{`Votes: ${poll.vote_6}`}</p>
-                    </>
-                  )}
+                        return null;
+                      })}
 
-                  {poll.option_7 && (
-                    <>
-                      <p>{`Option 7: ${poll.option_7}`}</p>
-                      <p>{`Votes: ${poll.vote_7}`}</p>
-                    </>
-                  )}
-
-                  {poll.option_8 && (
-                    <>
-                      <p>{`Option 8: ${poll.option_8}`}</p>
-                      <p>{`Votes: ${poll.vote_8}`}</p>
-                    </>
-                  )}
-                  {poll.option_9 && (
-                    <>
-                      <p>{`Option 9: ${poll.option_9}`}</p>
-                      <p>{`Votes: ${poll.vote_9}`}</p>
-                    </>
-                  )}
-
-                  {poll.option_10 && (
-                    <>
-                      <p>{`Option 10: ${poll.option_10}`}</p>
-                      <p>{`Votes: ${poll.vote_10}`}</p>
-                    </>
-                  )}
-
-                  <br />
-                  <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
-                    Delete Poll
-                  </BtnSmallBeije>
-                </PollDisplay>
-              ))}
+                    <br />
+                    <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>
+                      Delete Poll
+                    </BtnSmallBeije>
+                  </PollDisplay>
+                );
+              })}
           </PollDisplayContainer>
           <TextWarning>
             Polls cannot be edited. Please remove and create a new one.
@@ -587,7 +482,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
               <InputContainer>
                 <label htmlFor="pollNameInput">Poll Name:</label>
                 <InputStyled
-                id="pollNameInput"
+                  id="pollNameInput"
                   type="text"
                   name="newPoll.name"
                   onChange={handleInputChange}
@@ -598,21 +493,19 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                 <InputContainer key={index}>
                   <label htmlFor="optionInput">{`Option ${index + 1}:`}</label>
                   <InputStyled
-                  id="optionInput"
+                    id="optionInput"
                     type="text"
                     name={`newPoll.option_${index + 1}`}
                     onChange={handleInputChange}
                     value={
-                      (updatedEvent?.newPoll?.[
-                        `option_${
-                          index + 1
-                        }` as keyof typeof updatedEvent.newPoll
-                      ] as string) || ""
+                      updatedEvent?.newPoll?.[`option_${index + 1}`]
+                        ?.toString()
+                        .trim() || ""
                     }
                   />
                   <BtnSmallBeije onClick={() => handleRemoveOption(index)}>
-                Remove 
-              </BtnSmallBeije>
+                    Remove
+                  </BtnSmallBeije>
                 </InputContainer>
               ))}
               <PollBtnContainer>
@@ -661,7 +554,7 @@ const PollDisplay = styled.div`
   border: 1px solid #f3d8b6;
   border-radius: 20px;
   padding: 20px;
-
+  margin-top: 10px;
   @media screen and (max-width: 1280px) {
   }
 
@@ -672,6 +565,7 @@ const PollDisplay = styled.div`
 const PollDisplayContainer = styled.div`
   width: 40%;
   display: flex;
+  flex-wrap: wrap;
   gap: 2%;
   justify-content: center;
   align-items: center;
@@ -763,7 +657,7 @@ const BtnMedium = styled.button`
 `;
 
 const BtnSmallBeije = styled.button`
-margin-bottom: 3%;
+  margin-bottom: 3%;
   padding: 5px;
   width: auto;
   border-radius: 10px;

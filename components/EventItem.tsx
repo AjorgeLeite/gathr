@@ -12,32 +12,15 @@ type User = {
   email: string;
 };
 
-type Poll = {
+export type Poll = {
   id: number;
   created_at: number;
   name: string;
-  option_1: string;
-  option_2: string;
-  option_3: string;
-  option_4: any;
-  option_5: any;
-  option_6: any;
-  option_7: any;
-  option_8: any;
-  option_9: any;
-  option_10: any;
-  vote_1: number;
-  vote_2: number;
-  vote_3: number;
-  vote_4: number;
-  vote_5: number;
-  vote_6: number;
-  vote_7: number;
-  vote_8: number;
-  vote_9: number;
-  vote_10: number;
+  options: string[];
+  votes: number[];
   already_voted: number[];
-  polls_id?: number[];
+  polls_id?: number[] | undefined;
+  [key: string]: string | string[] | number | number[] | undefined;
 };
 
 type Event = {
@@ -49,33 +32,7 @@ type Event = {
   going: User[];
   invited: User[];
   polls_id?: Poll[];
-  newPoll?: {
-    id: number;
-    created_at: number;
-    name: string;
-    option_1: string;
-    option_2: string;
-    option_3: string;
-    option_4: any;
-    option_5: any;
-    option_6: any;
-    option_7: any;
-    option_8: any;
-    option_9: any;
-    option_10: any;
-    vote_1: number;
-    vote_2: number;
-    vote_3: number;
-    vote_4: number;
-    vote_5: number;
-    vote_6: number;
-    vote_7: number;
-    vote_8: number;
-    vote_9: number;
-    vote_10: number;
-    already_voted: number[];
-    polls_id?: number[];
-  };
+  newPoll?: Poll;
 };
 
 type EventItemProps = {
@@ -106,7 +63,7 @@ const EventItem: React.FC<EventItemProps> = ({
   useEffect(() => {
     const initialVotedPolls: number[] = [];
     const initialPollDataMap: Record<number, Poll | null> = {};
-
+  
     for (const event of events) {
       if (event.polls_id) {
         for (const poll of event.polls_id) {
@@ -117,7 +74,7 @@ const EventItem: React.FC<EventItemProps> = ({
         }
       }
     }
-
+  
     setVotedPolls(initialVotedPolls);
     setPollDataMap(initialPollDataMap);
   }, [events, userId]);
@@ -129,26 +86,21 @@ const EventItem: React.FC<EventItemProps> = ({
   ) => {
     try {
       const currentPollData = pollDataMap[pollId];
-
+  
       const updatedEvents = events.map((event) => {
         if (event.id === eventId && event.polls_id) {
           return {
             ...event,
             polls_id: event.polls_id.map((poll) => {
               if (poll.id === pollId) {
-                const updatedPoll = {
-                  ...poll,
-                  [`vote_${optionVote}` as keyof Poll]:
-                    (poll[`vote_${optionVote}` as keyof Poll] as number) + 1,
-                  already_voted: [...(poll.already_voted || []), userId],
-                };
-
-                setPollDataMap((prevMap) => ({
-                  ...prevMap,
-                  [pollId]: updatedPoll,
-                }));
-                setVotedPolls((prevVotedPolls) => [...prevVotedPolls, pollId]);
-                return updatedPoll;
+                const voteKey = `vote_${optionVote}`;
+                const currentVoteValue = poll[voteKey];
+  
+                if (typeof currentVoteValue === "number") {
+                  poll[voteKey] = currentVoteValue + 1;
+                  poll.already_voted = [...(poll.already_voted || []), userId];
+                }
+                return poll;
               }
               return poll;
             }),
@@ -156,46 +108,30 @@ const EventItem: React.FC<EventItemProps> = ({
         }
         return event;
       });
-
+  
       const updatedPoll = updatedEvents
         .find((event) => event.id === eventId)
         ?.polls_id?.find((poll) => poll.id === pollId);
-
+  
       setPollDataMap((prevMap) => ({
         ...prevMap,
-        [pollId]: updatedPoll as Poll,
+        [pollId]: updatedPoll || null,
       }));
-
+  
+      setVotedPolls((prevVotedPolls) =>
+        prevVotedPolls.includes(pollId)
+          ? prevVotedPolls
+          : [...prevVotedPolls, pollId]
+      );
+  
+      const payload = updatedPoll;
+  
       await axios.patch(
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${pollId}`,
-        {
-          polls_id: updatedPoll?.polls_id,
-          name: updatedPoll?.name,
-          option_1: updatedPoll?.option_1,
-          option_2: updatedPoll?.option_2,
-          option_3: updatedPoll?.option_3,
-          option_4: updatedPoll?.option_4,
-          option_5: updatedPoll?.option_5,
-          option_6: updatedPoll?.option_6,
-          option_7: updatedPoll?.option_7,
-          option_8: updatedPoll?.option_8,
-          option_9: updatedPoll?.option_9,
-          option_10: updatedPoll?.option_10,
-          vote_1: updatedPoll?.vote_1,
-          vote_2: updatedPoll?.vote_2,
-          vote_3: updatedPoll?.vote_3,
-          vote_4: updatedPoll?.vote_4,
-          vote_5: updatedPoll?.vote_5,
-          vote_6: updatedPoll?.vote_6,
-          vote_7: updatedPoll?.vote_7,
-          vote_8: updatedPoll?.vote_8,
-          vote_9: updatedPoll?.vote_9,
-          vote_10: updatedPoll?.vote_10,
-          already_voted: updatedPoll?.already_voted,
-        }
+        payload
       );
     } catch (error) {
-      console.log("error:", error);
+      console.error("Error handling vote:", error);
     }
   };
 
@@ -214,10 +150,10 @@ const EventItem: React.FC<EventItemProps> = ({
 
       const event = response.data;
       console.log("event", event);
-      let updatedEvent: Event;
+      let updatedEvent;
 
       const updatedPolls = (event.polls_id?.map((poll) => poll.polls_id) ||
-        []) as unknown as Poll[];
+        []) ;
 
       if (willGo) {
         console.log("updatedpolls", updatedPolls);
@@ -294,107 +230,31 @@ const EventItem: React.FC<EventItemProps> = ({
                             key={poll.id}
                             pollData={pollDataMap[poll.id] || poll}
                           />
-                          {votedPolls.includes(poll.id) && (
-                            <>
-                              <RedText>
-                                You already voted for this poll.
-                              </RedText>
-                            </>
-                          )}
-                          {!votedPolls.includes(poll.id) && poll.option_1 && (
-                            <>
-                              <RedText>Vote Here</RedText>
-                              <VoteBtnContainer>
-                                <VoteBtn
-                                  onClick={() =>
-                                    handleVote(poll.id, 1, event.id)
-                                  }
-                                >
-                                  {poll.option_1}
-                                </VoteBtn>
-                                {poll.option_2 && (
+                          {votedPolls.includes(poll.id) ? (
+                            <RedText>You already voted for this poll.</RedText>
+                          ) : (
+                            Array.from({ length: 10 }, (_, index) => {
+                              const optionKey = `option_${index + 1}`;
+                              const optionValue = poll[optionKey];
+
+                              if (
+                                typeof optionValue === "string" &&
+                                optionValue.trim() !== ""
+                              ) {
+                                return (
                                   <VoteBtn
+                                    key={optionKey}
                                     onClick={() =>
-                                      handleVote(poll.id, 2, event.id)
+                                      handleVote(poll.id, index + 1, event.id)
                                     }
                                   >
-                                    {poll.option_2}
+                                    {`${optionValue}`}
                                   </VoteBtn>
-                                )}
-                                {poll.option_3 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 3, event.id)
-                                    }
-                                  >
-                                    {poll.option_3}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_4 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 4, event.id)
-                                    }
-                                  >
-                                    {poll.option_4}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_5 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 5, event.id)
-                                    }
-                                  >
-                                    {poll.option_5}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_6 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 6, event.id)
-                                    }
-                                  >
-                                    {poll.option_6}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_7 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 7, event.id)
-                                    }
-                                  >
-                                    {poll.option_7}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_8 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 8, event.id)
-                                    }
-                                  >
-                                    {poll.option_8}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_9 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 9, event.id)
-                                    }
-                                  >
-                                    {poll.option_9}
-                                  </VoteBtn>
-                                )}
-                                {poll.option_10 && (
-                                  <VoteBtn
-                                    onClick={() =>
-                                      handleVote(poll.id, 10, event.id)
-                                    }
-                                  >
-                                    {poll.option_10}
-                                  </VoteBtn>
-                                )}
-                              </VoteBtnContainer>
-                            </>
+                                );
+                              }
+
+                              return null;
+                            })
                           )}
                         </ChartAndVote>
                       </div>
@@ -402,6 +262,7 @@ const EventItem: React.FC<EventItemProps> = ({
                   </ChartVoteContainer>
                 </>
               )}
+
               <InvitedEmaisDisplay>
                 {invitedEmails.length > 0 && (
                   <GorOrNot>
@@ -555,6 +416,7 @@ const VoteBtn = styled.button`
   cursor: pointer;
   transition: background-color 0.5s, color 0.3s;
   margin-top: 5px;
+  margin-right: 5px;
   &:hover {
     background-color: #f57265;
     color: #f3d8b6;
@@ -643,7 +505,6 @@ const AccordionHeader = styled.div`
   display: flex;
   justify-content: space-around;
   transition: background-color 0.3s ease-in-out;
-  
 
   &:hover {
     animation: ${fadeInOut} 1.5s infinite;

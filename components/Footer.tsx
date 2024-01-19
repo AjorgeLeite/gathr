@@ -25,7 +25,7 @@ const Footer = () => {
         </FooterLinks>
         <FooterInfo>
           <Link href={"#"}>
-            <p>Copyright © 2021 Gathr</p>
+            <p>Copyright © 2024 Gathr</p>
           </Link>
           <Link href={"#"}>
             <p>All Rights Reserved</p>

@@ -21,26 +21,8 @@ type Poll = {
   id: number;
   created_at: number;
   name: string;
-  option_1: string;
-  option_2: string;
-  option_3: string;
-  option_4: any;
-  option_5: any;
-  option_6: any;
-  option_7: any;
-  option_8: any;
-  option_9: any;
-  option_10: any;
-  vote_1: number;
-  vote_2: number;
-  vote_3: number;
-  vote_4: number;
-  vote_5: number;
-  vote_6: number;
-  vote_7: number;
-  vote_8: number;
-  vote_9: number;
-  vote_10: number;
+  options: string[];
+  votes: number[];
   already_voted: number[];
   polls_id?: number[];
 };
@@ -54,33 +36,7 @@ type Event = {
   going: User[];
   invited: User[];
   polls_id?: Poll[];
-  newPoll?: {
-    id: number;
-    created_at: number;
-    name: string;
-    option_1: string;
-    option_2: string;
-    option_3: string;
-    option_4: any;
-    option_5: any;
-    option_6: any;
-    option_7: any;
-    option_8: any;
-    option_9: any;
-    option_10: any;
-    vote_1: number;
-    vote_2: number;
-    vote_3: number;
-    vote_4: number;
-    vote_5: number;
-    vote_6: number;
-    vote_7: number;
-    vote_8: number;
-    vote_9: number;
-    vote_10: number;
-    already_voted: number[];
-    polls_id?: number[];
-  };
+  newPoll?: Poll;
 };
 
 type EventsPageProps = {
@@ -148,7 +104,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ events }) => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("isloggedin",userData.isLoggedIn)
+    console.log("isloggedin", userData.isLoggedIn);
     if (!userData.isLoggedIn) {
       router.push("/login");
     }
