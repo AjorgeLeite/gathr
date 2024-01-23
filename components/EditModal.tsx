@@ -185,10 +185,16 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
         {
           name: newPollName,
-          ...selectedOptions.reduce((acc, option, index) => {
-            acc[`option_${index + 1}`] = option;
-            return acc;
-          }, {} as Record<string, any>),
+          option_1: selectedOptions[0],
+          option_2: selectedOptions[1],
+          option_3: selectedOptions[2],
+          option_4: selectedOptions[3],
+          option_5: selectedOptions[4],
+          option_6: selectedOptions[5],
+          option_7: selectedOptions[6],
+          option_8: selectedOptions[7],
+          option_9: selectedOptions[8],
+          option_10: selectedOptions[9],
         }
       );
 
@@ -200,10 +206,16 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         name: newPollName,
         already_voted: [],
         polls_id: [],
-        ...selectedOptions.reduce((acc, option, index) => {
-          acc[`option_${index + 1}`] = option;
-          return acc;
-        }, {} as Record<string, any>),
+        option_1: selectedOptions[0],
+        option_2: selectedOptions[1],
+        option_3: selectedOptions[2],
+        option_4: selectedOptions[3],
+        option_5: selectedOptions[4],
+        option_6: selectedOptions[5],
+        option_7: selectedOptions[6],
+        option_8: selectedOptions[7],
+        option_9: selectedOptions[8],
+        option_10: selectedOptions[9],
         options: selectedOptions,
         votes: [],
       };
@@ -255,10 +267,16 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
         {
           name: newPollName,
-          ...selectedOptions.reduce((acc, option, index) => {
-            acc[`option_${index + 1}`] = option;
-            return acc;
-          }, {} as Record<string, any>),
+          option_1: selectedOptions[0],
+          option_2: selectedOptions[1],
+          option_3: selectedOptions[2],
+          option_4: selectedOptions[3],
+          option_5: selectedOptions[4],
+          option_6: selectedOptions[5],
+          option_7: selectedOptions[6],
+          option_8: selectedOptions[7],
+          option_9: selectedOptions[8],
+          option_10: selectedOptions[9],
           already_voted: [],
           polls_id: newPollId,
         }
@@ -444,7 +462,7 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                     {Object.keys(poll)
                       .filter((key) => key.startsWith("option_"))
                       .map((optionKey, index) => {
-                        const optionValue = poll[optionKey]!.toString().trim();
+                        const optionValue = poll[optionKey]?.toString().trim() || ""; 
 
                         if (optionValue !== "") {
                           const voteKey = `vote_${index + 1}`;
