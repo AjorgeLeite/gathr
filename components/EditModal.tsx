@@ -82,21 +82,23 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
   const handleDeletePoll = (pollIndex: number) => {
     if (!updatedEvent) return;
 
-    const updatedPolls = [...(updatedEvent.polls_id || [])];
-    const deletedPollId = updatedPolls[pollIndex]?.id;
+    const updatedPolls = updatedEvent.polls_id || [];
 
-    updatedPolls.splice(pollIndex, 1);
+    if (pollIndex < 0 || pollIndex >= updatedPolls.length) return;
 
-    const remainingPollIds: number[] = updatedPolls
-      .flatMap((poll) => poll.polls_id || [])
-      .filter((id) => id !== deletedPollId);
+    const deletedPoll = updatedPolls[pollIndex];
+    const deletedPollId = deletedPoll?.id;
+    const remainingPolls = updatedPolls.filter(
+      (poll) => poll.id !== deletedPollId
+    );
+    const remainingPollIds = newPollIds.filter((id) => id !== deletedPollId);
+    const updatedEventWithDeletedPoll = {
+      ...updatedEvent,
+      polls_id: remainingPolls,
+    };
 
     setNewPollIds(remainingPollIds);
-
-    setUpdatedEvent({
-      ...updatedEvent,
-      polls_id: updatedPolls,
-    });
+    setUpdatedEvent(updatedEventWithDeletedPoll);
   };
 
   const handleRemoveInvite = (index: number) => {
@@ -107,10 +109,9 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
 
   useEffect(() => {
     const fetchEvent = async () => {
-      console.log("event fetching", event);
       try {
         setUpdatedEvent(event);
-        console.log("polls_id:s", event);
+
         const updatedInvitedUsers: InvitedUser[] = event.invited.map(
           (user: User) => ({
             invitedUserId: user.id,
@@ -119,12 +120,6 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         );
 
         setInvitedUsers(updatedInvitedUsers);
-        const pollIds = event.polls_id?.map((poll) => poll.polls_id) || [];
-        console.log("useffectpollids", pollIds);
-        console.log("event", event);
-        setNewPollIds(
-          pollIds.flat().flatMap((id) => (id !== undefined ? [id] : []))
-        );
       } catch (error: any) {
         console.error("Error fetching event:", error.message);
       }
@@ -185,104 +180,75 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
         {
           name: newPollName,
-          option_1: selectedOptions[0],
-          option_2: selectedOptions[1],
-          option_3: selectedOptions[2],
-          option_4: selectedOptions[3],
-          option_5: selectedOptions[4],
-          option_6: selectedOptions[5],
-          option_7: selectedOptions[6],
-          option_8: selectedOptions[7],
-          option_9: selectedOptions[8],
-          option_10: selectedOptions[9],
+          options: selectedOptions,
         }
       );
 
       const newOptionsId = optionsResponse.data.id;
 
       const newPoll = {
-        id: 0,
+        id: newOptionsId,
         created_at: 0,
         name: newPollName,
         already_voted: [],
         polls_id: [],
-        option_1: selectedOptions[0],
-        option_2: selectedOptions[1],
-        option_3: selectedOptions[2],
-        option_4: selectedOptions[3],
-        option_5: selectedOptions[4],
-        option_6: selectedOptions[5],
-        option_7: selectedOptions[6],
-        option_8: selectedOptions[7],
-        option_9: selectedOptions[8],
-        option_10: selectedOptions[9],
         options: selectedOptions,
-        votes: [],
+        votes: Array(selectedOptions.length).fill(0),
       };
 
-      setUpdatedEvent((prevEvent) => {
-        if (!prevEvent) return prevEvent;
+      if (newPoll.id !== 0 && newPoll.id !== "") {
+        setUpdatedEvent((prevEvent) => {
+          if (!prevEvent) return prevEvent;
 
-        const updatedPolls = [...(prevEvent.polls_id || [])];
-        updatedPolls.push(newPoll);
+          const updatedPolls = [...(prevEvent.polls_id || [])];
+          updatedPolls.push(newPoll);
 
-        const updatedOptions: Record<string, string> = {};
-        selectedOptions.forEach((option, index) => {
-          updatedOptions[`Option ${index + 1}`] = option;
+          return {
+            ...prevEvent,
+            polls_id: updatedPolls,
+            newPoll: {
+              id: 0,
+              created_at: 0,
+              name: "",
+              already_voted: [],
+              polls_id: [],
+              options: [],
+              votes: [],
+            },
+          };
         });
 
-        return {
-          ...prevEvent,
-          polls_id: updatedPolls,
-          newPoll: {
-            id: 0,
-            created_at: 0,
-            name: "",
-            already_voted: [],
-            polls_id: [],
+        const pollResponse = await axios.post(
+          "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
+          {
+            name: newPollName,
+            poll_options_id: newOptionsId,
+          }
+        );
+
+        const newPollId = pollResponse.data.id;
+
+        const updatedPrevPollsIds = Array.from(
+          new Set([...newPollIds, newPollId])
+        );
+
+        setNewPollIds(updatedPrevPollsIds);
+
+        await axios.patch(
+          `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
+          {
+            name: newPollName,
             options: selectedOptions,
-            votes: [],
-            ...updatedOptions,
-          },
-        };
-      });
+            already_voted: [],
+            polls_id: newPollId,
+            votes: Array(selectedOptions.length).fill(0),
+          }
+        );
 
-      const pollResponse = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
-        {
-          name: newPollName,
-          poll_options_id: newOptionsId,
-        }
-      );
-
-      const newPollId = pollResponse.data.id || 0;
-
-      const updatedPrevPollsIds = Array.from(
-        new Set([...newPollIds, newPollId])
-      );
-
-      setNewPollIds(updatedPrevPollsIds);
-
-      await axios.patch(
-        `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${newOptionsId}`,
-        {
-          name: newPollName,
-          option_1: selectedOptions[0],
-          option_2: selectedOptions[1],
-          option_3: selectedOptions[2],
-          option_4: selectedOptions[3],
-          option_5: selectedOptions[4],
-          option_6: selectedOptions[5],
-          option_7: selectedOptions[6],
-          option_8: selectedOptions[7],
-          option_9: selectedOptions[8],
-          option_10: selectedOptions[9],
-          already_voted: [],
-          polls_id: newPollId,
-        }
-      );
-
-      setPollErrorMsg("");
+        setPollErrorMsg("");
+      } else {
+        console.error("Invalid poll ID:", newPoll.id);
+      }
     } catch (error) {
       console.error("Error creating poll:", error);
     }
@@ -350,28 +316,26 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
     }
 
     try {
-      const { polls_id, ...eventData } = updatedEvent;
+      const { polls_id, newPoll, ...eventData } = updatedEvent;
 
       const invitedUserIds = invitedUsers.map((user) => user.invitedUserId);
 
-      const hasPollChanges =
-        JSON.stringify(newPollIds.sort()) !==
-        JSON.stringify(polls_id?.map((poll) => poll.id)?.sort());
-
-      console.log("ididididid", polls_id);
-      console.log("pollchange", hasPollChanges);
+      const pollIds = polls_id?.map((poll) => poll.id) || [];
 
       const updatedEventData = {
         name: updatedEvent?.name || "",
         description: updatedEvent?.description || "",
         invited: updatedEvent?.invited || [],
-        polls_id: hasPollChanges
-          ? newPollIds
-          : polls_id?.map((poll) => poll.polls_id),
+        polls_id: [
+          ...(updatedEvent?.polls_id?.map((poll) => poll.polls_id).flat() ||
+            []),
+          ...newPollIds,
+        ],
         created_by: updatedEvent?.created_by,
         going: updatedEvent?.going || [],
       };
-      console.log("updatedEventData", updatedEventData);
+
+      console.log("updated event data: " + updatedEventData.polls_id);
       await axios.patch(
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/events/${event.id}`,
         {
@@ -384,10 +348,11 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
           },
         }
       );
+
       setErrorMsg("");
       onSave(updatedEvent);
-      router.push("/events");
       onCancel();
+      router.reload();
     } catch (error: any) {
       console.error("Error updating event:", error.message);
     }
@@ -459,30 +424,22 @@ const EditEvent: React.FC<EventItemProps> = ({ event, onSave, onCancel }) => {
                     <h4>{`Poll ${pollIndex + 1}: ${poll.name}`}</h4>
                     <br />
 
-                    {Object.keys(poll)
-                      .filter((key) => key.startsWith("option_"))
-                      .map((optionKey, index) => {
-                        const optionValue = poll[optionKey]?.toString().trim() || ""; 
+                    {poll.options.map((option, optionIndex) => {
+                      const voteKey = `vote_${optionIndex + 1}`;
+                      const voteCount =
+                        poll[voteKey] !== undefined ? poll[voteKey] : 0;
 
-                        if (optionValue !== "") {
-                          const voteKey = `vote_${index + 1}`;
-                          const voteCount =
-                            poll[voteKey] !== undefined ? poll[voteKey] : 0;
-
-                          return (
-                            <div key={index}>
-                              <p>{`Option: ${optionValue}`}</p>
-                              {voteCount !== 0 ? (
-                                <p>{`Votes: ${voteCount}`}</p>
-                              ) : (
-                                <p>No votes</p>
-                              )}
-                            </div>
-                          );
-                        }
-
-                        return null;
-                      })}
+                      return (
+                        <div key={optionIndex}>
+                          <p>{`Option: ${option}`}</p>
+                          {voteCount !== 0 ? (
+                            <p>{`Votes: ${voteCount}`}</p>
+                          ) : (
+                            <p>No votes</p>
+                          )}
+                        </div>
+                      );
+                    })}
 
                     <br />
                     <BtnSmallBeije onClick={() => handleDeletePoll(pollIndex)}>

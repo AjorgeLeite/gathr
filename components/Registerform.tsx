@@ -36,22 +36,21 @@ const RegisterForm: FC<RegisterTypes> = ({ setIsLoggedIn, setUserName }) => {
         error: false,
         errorMessage: "",
       });
-      
-      await axios.post(
+
+      const registerResponse = await axios.post(
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/signup",
         { email, password, name }
       );
-
-      const loginResponse = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/auth/login",
-        { email, password }
+      dispatch(
+        loginSuccess(
+          registerResponse.data.user.name,
+          registerResponse.data.user.id
+        )
       );
-
-      dispatch(loginSuccess(loginResponse.data.user.name, loginResponse.data.user.id));
-      setUserName(loginResponse.data.user.name);
+      setUserName(registerResponse.data.user.name);
       setIsLoggedIn(true);
 
-      setCookie(null, "authToken", loginResponse.data.authToken, {
+      setCookie(null, "authToken", registerResponse.data.authToken, {
         maxAge: 30 * 24 * 60 * 60,
         path: "/",
       });

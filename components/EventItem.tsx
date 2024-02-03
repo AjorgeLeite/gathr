@@ -63,7 +63,7 @@ const EventItem: React.FC<EventItemProps> = ({
   useEffect(() => {
     const initialVotedPolls: number[] = [];
     const initialPollDataMap: Record<number, Poll | null> = {};
-  
+
     for (const event of events) {
       if (event.polls_id) {
         for (const poll of event.polls_id) {
@@ -74,7 +74,7 @@ const EventItem: React.FC<EventItemProps> = ({
         }
       }
     }
-  
+
     setVotedPolls(initialVotedPolls);
     setPollDataMap(initialPollDataMap);
   }, [events, userId]);
@@ -85,22 +85,15 @@ const EventItem: React.FC<EventItemProps> = ({
     eventId: number
   ) => {
     try {
-      const currentPollData = pollDataMap[pollId];
-  
       const updatedEvents = events.map((event) => {
         if (event.id === eventId && event.polls_id) {
           return {
             ...event,
             polls_id: event.polls_id.map((poll) => {
               if (poll.id === pollId) {
-                const voteKey = `vote_${optionVote}`;
-                const currentVoteValue = poll[voteKey];
-  
-                if (typeof currentVoteValue === "number") {
-                  poll[voteKey] = currentVoteValue + 1;
-                  poll.already_voted = [...(poll.already_voted || []), userId];
-                }
-                return poll;
+                const voteIndex = optionVote - 1;
+                poll.votes[voteIndex] += 1;
+                poll.already_voted = [...(poll.already_voted || []), userId];
               }
               return poll;
             }),
@@ -108,24 +101,24 @@ const EventItem: React.FC<EventItemProps> = ({
         }
         return event;
       });
-  
+
       const updatedPoll = updatedEvents
         .find((event) => event.id === eventId)
         ?.polls_id?.find((poll) => poll.id === pollId);
-  
+
       setPollDataMap((prevMap) => ({
         ...prevMap,
         [pollId]: updatedPoll || null,
       }));
-  
+
       setVotedPolls((prevVotedPolls) =>
         prevVotedPolls.includes(pollId)
           ? prevVotedPolls
           : [...prevVotedPolls, pollId]
       );
-  
+
       const payload = updatedPoll;
-  
+
       await axios.patch(
         `https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options/${pollId}`,
         payload
@@ -152,8 +145,7 @@ const EventItem: React.FC<EventItemProps> = ({
       console.log("event", event);
       let updatedEvent;
 
-      const updatedPolls = (event.polls_id?.map((poll) => poll.polls_id) ||
-        []) ;
+      const updatedPolls = event.polls_id?.map((poll) => poll.polls_id) || [];
 
       if (willGo) {
         console.log("updatedpolls", updatedPolls);
@@ -222,43 +214,35 @@ const EventItem: React.FC<EventItemProps> = ({
                 <>
                   <BeijeTitle>Polls:</BeijeTitle>
                   <ChartVoteContainer>
-                    {event.polls_id.map((poll) => (
-                      <div key={poll.id}>
-                        <BeijeText>{poll.name}</BeijeText>
-                        <ChartAndVote>
-                          <DoughnutChart
-                            key={poll.id}
-                            pollData={pollDataMap[poll.id] || poll}
-                          />
-                          {votedPolls.includes(poll.id) ? (
-                            <RedText>You already voted for this poll.</RedText>
-                          ) : (
-                            Array.from({ length: 10 }, (_, index) => {
-                              const optionKey = `option_${index + 1}`;
-                              const optionValue = poll[optionKey];
-
-                              if (
-                                typeof optionValue === "string" &&
-                                optionValue.trim() !== ""
-                              ) {
-                                return (
+                    {event.polls_id.map((poll) => {
+                      const pollData = pollDataMap[poll.id] || poll;
+                      return (
+                        <div key={poll.id}>
+                          <BeijeText>{pollData.name}</BeijeText>
+                          <ChartAndVote>
+                            <DoughnutChart key={poll.id} pollData={pollData} />
+                            {votedPolls.includes(poll.id) ? (
+                              <RedText>
+                                You already voted for this poll.
+                              </RedText>
+                            ) : (
+                              <VoteBtnContainer>
+                                {pollData.options.map((option, index) => (
                                   <VoteBtn
-                                    key={optionKey}
+                                    key={index}
                                     onClick={() =>
                                       handleVote(poll.id, index + 1, event.id)
                                     }
                                   >
-                                    {`${optionValue}`}
+                                    {`${option}`}
                                   </VoteBtn>
-                                );
-                              }
-
-                              return null;
-                            })
-                          )}
-                        </ChartAndVote>
-                      </div>
-                    ))}
+                                ))}
+                              </VoteBtnContainer>
+                            )}
+                          </ChartAndVote>
+                        </div>
+                      );
+                    })}
                   </ChartVoteContainer>
                 </>
               )}

@@ -1,6 +1,6 @@
 import { parseCookies } from "nookies";
 import axios from "axios";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -132,39 +132,21 @@ const NewEvent: React.FC = () => {
         "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/polls",
         {
           name: selectedPoll.name,
-          poll_options_id: [],
         }
       );
 
       const createdPoll = pollResponse.data;
       const pollId = createdPoll.id;
 
-      const options: { [key: string]: any } = selectedPoll.options.reduce(
-        (acc, option, optionIndex) => {
-          acc[`option_${optionIndex + 1}`] = option;
-          return acc;
-        },
+      const pollOptionResponse = await axios.post(
+        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
         {
           polls_id: pollId,
           name: selectedPoll.name,
-          vote_1: 0,
-          vote_2: 0,
-          vote_3: 0,
-          vote_4: 0,
-          vote_5: 0,
-          vote_6: 0,
-          vote_7: 0,
-          vote_8: 0,
-          vote_9: 0,
-          vote_10: 0,
+          options: selectedPoll.options,
           already_voted: [],
-        } as any
-      );
-
-      console.log("options: ", options);
-      const pollOptionResponse = await axios.post(
-        "https://x8ki-letl-twmt.n7.xano.io/api:pI50Mzzv/poll_options",
-        options
+          votes: selectedPoll.options.map(() => 0),
+        }
       );
 
       const pollOptionId = pollOptionResponse.data.id;
@@ -195,6 +177,11 @@ const NewEvent: React.FC = () => {
   const handleSubmitEvent = async () => {
     if (eventName.trim() === "" || eventDescription.trim() === "") {
       setErrorMsg("Event name and description cannot be empty.");
+      return;
+    }
+
+    if (addedPolls.length === 0) {
+      setErrorMsg("You need to add at least one poll to the event.");
       return;
     }
 

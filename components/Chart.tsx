@@ -10,27 +10,11 @@ type PollDoughnutChartProps = {
 const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
   console.log("polldata", pollData);
 
-  const optionKeys = Object.keys(pollData).filter(
-    (key) => key.startsWith("option_") && pollData[key] !== undefined
-  );
-
-  const noEmptyLabels = optionKeys
-    .map((key) => {
-      const label = pollData[key];
-      return typeof label === "string" ? label.trim() : "";
-    })
-    .filter((label) => label !== "");
-
-  const voteKeys = optionKeys.map((key) => key.replace("option_", "vote_"));
-  const votes = voteKeys.map((key) =>
-    typeof pollData[key] === "number" ? pollData[key] : 0
-  );
-
   const chartData = {
-    labels: noEmptyLabels,
+    labels: pollData.options,
     datasets: [
       {
-        data: votes,
+        data: pollData.votes,
         backgroundColor: [
           "#f57265",
           "#f3d8b6",
@@ -71,7 +55,7 @@ const PollDoughnutChart: React.FC<PollDoughnutChartProps> = ({ pollData }) => {
 
   return (
     <>
-      {noEmptyLabels.length > 0 && (
+      {pollData.options.length > 0 && (
         <Doughnut data={chartData} options={chartOptions} />
       )}
     </>
